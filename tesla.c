@@ -6,11 +6,11 @@
 
 #define BUFSIZE 256
 
-void print_grid(int size, int px, int py) {
+void print_grid(int size, int player_x, int player_y) {
   for(size_t i = 0; i < size; ++i) {
     fprintf(stderr, "|");
     for(size_t j = 0; j < size; ++j) {
-      if(i == px && j == py) {
+      if(i == player_x && j == player_y) {
         fprintf(stderr, "x");
       } else {
         fprintf(stderr, " ");
@@ -35,9 +35,9 @@ int main(int argc, char const *argv[]) {
   }
 
   fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse initiale
-  int px = atoi(buf);
+  int player_x = atoi(buf);
   fgets(buf, BUFSIZE, stdin); // Récupérer l'ordonnée initiale
-  int py = atoi(buf);
+  int player_y = atoi(buf);
 
   fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse de l'objectif
   int x = atoi(buf); 
@@ -50,13 +50,13 @@ int main(int argc, char const *argv[]) {
   int vx = 0;
   int vy = 0;
 
-  print_grid(size, px, py);
+  print_grid(size, player_x, player_y);
   return;
   
   for (;;) {
-    // compute new px and new py
+    // compute new player_x and new player_y
     // TODO
-    printf("%i\n%i\n", px, py);
+    printf("%i\n%i\n", player_x, player_y);
     // get the response
     fgets(buf, BUFSIZE, stdin);
     if (strcmp(buf, "ERROR\n") == 0) {
