@@ -1,5 +1,6 @@
 #include "tesla.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,48 +20,74 @@ void print_grid(int size, int player_x, int player_y) {
     }
     fprintf(stderr, "\n");
   }
+
+/**
+ * Écrit les informations reçues du serveur concernant l'objectif
+ */
+static void get_obj_coords(int *x, int *y, int *w, int *h) {
+  assert(x != NULL);
+  assert(y != NULL);
+  assert(w != NULL);
+  assert(h != NULL);
+
+  char buf[BUFSIZE];
+  fgets(buf, BUFSIZE, stdin); // Abscisse de l'objectif
+  (*x) = atoi(buf);
+  fgets(buf, BUFSIZE, stdin); // Ordonnée de l'objectif
+  (*y) = atoi(buf);
+  fgets(buf, BUFSIZE, stdin); // Largeur de l'objectif
+  (*w) = atoi(buf);
+  fgets(buf, BUFSIZE, stdin); // Hauteur de l'objectif
+  (*h) = atoi(buf);
 }
 
 int main(int argc, char const *argv[]) {
   setbuf(stdout, NULL);
   char buf[BUFSIZE];
-  
-  fgets(buf, BUFSIZE, stdin); // Récupérer la taille
-  int size = atoi(buf);
 
-  for (int i = 0; i < size * size; ++i) {
+  fgets(buf, BUFSIZE, stdin); // Récupérer la taille
+  const int SIZE = atoi(buf);
+
+  int *grid = calloc(SIZE * SIZE, sizeof(int));
+
+  for (int i = 0; i < SIZE * SIZE; ++i) {
     fgets(buf, BUFSIZE, stdin); // Récupérer les valeurs sur la grille
-    int value = atoi(buf);
-    // TODO: do something with value
+    grid[i] = atoi(buf);
   }
 
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse initiale
+  fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse initiale du joueur
   int player_x = atoi(buf);
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'ordonnée initiale
+  fgets(buf, BUFSIZE, stdin); // Récupérer l'ordonnée initiale du joueur
   int player_y = atoi(buf);
 
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse de l'objectif
-  int x = atoi(buf); 
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'ordonnée de l'objectif
-  int y = atoi(buf);
-  fgets(buf, BUFSIZE, stdin); // Récupérer la largeur de l'objectif
-  int w = atoi(buf);
-  fgets(buf, BUFSIZE, stdin); // Récupérer la hauteur de l'objectif
-  int h = atoi(buf);
+  int obj_x = 0; // Informations sur l'objectif
+  int obj_y = 0; //
+  int obj_w = 0; //
+  int obj_h = 0; //
+  get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
+
   int vx = 0;
   int vy = 0;
-  
+
   for (;;) {
     // compute new player_x and new player_y
     // TODO
-    printf("%i\n%i\n", player_x, player_y);
-    // get the response
-    fgets(buf, BUFSIZE, stdin);
-    if (strcmp(buf, "ERROR\n") == 0) {
+    printf("%i\n%i\n", player_x, player_y); // Envoyer les positions au serveur
+
+    fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
+
+    if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH") == 0) {
       break;
     }
+
+    if (strcmp(buf, "CHECKPOINT") == 0) { // Récupérer le nouvel objectif
+      get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
+      break;
+    }
+
     // TODO
   }
 
+  free(grid);
   return 0;
 }
