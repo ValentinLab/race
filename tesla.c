@@ -7,6 +7,20 @@
 
 #define BUFSIZE 256
 
+void print_grid(int size, int player_x, int player_y) {
+  for(size_t i = 0; i < size; ++i) {
+    fprintf(stderr, "|");
+    for(size_t j = 0; j < size; ++j) {
+      if(i == player_x && j == player_y) {
+        fprintf(stderr, "x");
+      } else {
+        fprintf(stderr, " ");
+      }
+      fprintf(stderr, "|");
+    }
+    fprintf(stderr, "\n");
+  }
+
 /**
  * Écrit les informations reçues du serveur concernant l'objectif
  */
@@ -56,9 +70,8 @@ int main(int argc, char const *argv[]) {
   int vy = 0;
 
   for (;;) {
-    // compute new px and new py
+    // compute new player_x and new player_y
     // TODO
-
     printf("%i\n%i\n", player_x, player_y); // Envoyer les positions au serveur
 
     fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
@@ -69,6 +82,7 @@ int main(int argc, char const *argv[]) {
 
     if (strcmp(buf, "CHECKPOINT") == 0) { // Récupérer le nouvel objectif
       get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
+      break;
     }
 
     // TODO
