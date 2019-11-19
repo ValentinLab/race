@@ -49,9 +49,6 @@ int main(int argc, char const *argv[]) {
   int h = atoi(buf);
   int vx = 0;
   int vy = 0;
-
-  print_grid(size, player_x, player_y);
-  return;
   
   for (;;) {
     // compute new player_x and new player_y
