@@ -11,27 +11,33 @@ int main(int argc, char const *argv[]) {
   setbuf(stdout, NULL);
   char buf[BUFSIZE];
 
-  fgets(buf, BUFSIZE, stdin); // Récupérer la taille
+  // Récupérer la taille de la grille
+  fgets(buf, BUFSIZE, stdin);
   const int SIZE = atoi(buf);
 
+  // Grille en row major
   int *grid = calloc(SIZE * SIZE, sizeof(int));
 
+  // Récupérer les valeurs sur la grille
   for (int i = 0; i < SIZE * SIZE; ++i) {
-    fgets(buf, BUFSIZE, stdin); // Récupérer les valeurs sur la grille
+    fgets(buf, BUFSIZE, stdin);
     grid[i] = atoi(buf);
   }
 
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'abscisse initiale du joueur
+  // Récupérer la position initiale du joueur
+  fgets(buf, BUFSIZE, stdin);
   int player_x = atoi(buf);
-  fgets(buf, BUFSIZE, stdin); // Récupérer l'ordonnée initiale du joueur
+  fgets(buf, BUFSIZE, stdin);
   int player_y = atoi(buf);
 
-  int obj_x = 0; // Informations sur l'objectif
-  int obj_y = 0; //
-  int obj_w = 0; //
-  int obj_h = 0; //
+  // Récupérer les informations sur l'objectif
+  int obj_x = 0; // abscisse
+  int obj_y = 0; // ordonnée
+  int obj_w = 0; // largeur
+  int obj_h = 0; // hauteur
   get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
 
+  // Vecteur vitesse du joueur
   int vx = 0;
   int vy = 0;
 
@@ -69,21 +75,19 @@ int main(int argc, char const *argv[]) {
       vy = 0;
     }
 
-    player_x += vx; // Nouvelle position
-    player_y += vy; //
+    // Mise à jour de la position du joueur
+    player_x += vx;
+    player_y += vy;
 
-    printf("%i\n%i\n", player_x, player_y); // Envoyer les positions au serveur
+    // Envoyer les positions au serveur
+    printf("%i\n%i\n", player_x, player_y);
 
-    fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
-
-    if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
+    // Récupérer la réponse du serveur
+    fgets(buf, BUFSIZE, stdin);
+    if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) { // fin du jeu ou erreur
       break;
     }
-
-    if (strcmp(buf, "CHECKPOINT\n") == 0) { // Récupérer le nouvel objectif
-      get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
-      continue;
-    }
+    get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h); // nouvel objectif
   }
 
   free(grid);
