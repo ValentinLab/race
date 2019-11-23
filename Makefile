@@ -1,7 +1,7 @@
 CFLAGS = -Wall -g -Iinclude -std=c99
 
 SHARED_OBJ = shared.o
-TARGETS = tesla slow
+TARGETS = tesla slow cugnot
 
 all: libshared.a $(TARGETS)
 
@@ -13,6 +13,9 @@ tesla: tesla.o libshared.a
 
 slow: slow.o libshared.a
 	cc -o $@ slow.o -L. -lshared -lpthread
+
+cugnot: cugnot.o libshared.a
+	cc -o $@ cugnot.o -L. -lshared -lpthread
 
 clean:
 	rm -f *.o

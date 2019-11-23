@@ -1,13 +1,36 @@
 #include "shared.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define BUFSIZE 256
 
-int main(int argc, char const *argv[]) {
+/**
+ * Met à jour la vitesse du joueur
+ * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est assez loin de l'objectif, il accélère
+ * Sinon, il garde la même vitesse.
+ */
+static int update_speed(int player_axis_p, int v, int obj_axis_p) {
+  int delta = axis_dist_2_obj(player_axis_p, obj_axis_p);
+
+  if (delta == 0) {
+    return 0;
+  }
+
+  if ((delta > 0 && delta < sum_1_to_n(v)) || (delta < 0 && -sum_1_to_n(v) < delta)) {
+    return reduce_v(v);
+  }
+
+  if ((delta > 0 && sum_1_to_n(v + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(v - 1))) {
+    return increase_v(v, player_axis_p, obj_axis_p);
+  }
+
+  return v;
+}
+
+int main() {
   setbuf(stdout, NULL);
   char buf[BUFSIZE];
 
@@ -35,39 +58,9 @@ int main(int argc, char const *argv[]) {
   int vx = 0;
   int vy = 0;
 
-  for (;;) {
-    // print_grid(SIZE, player_x, player_y);
-    if (obj_x < player_x) { // Nouvelle vitesse en X
-      if (vx > 0) {
-        vx = 0;
-      } else {
-        vx = -1;
-      }
-    } else if (obj_x > player_x) {
-      if (vx < 0) {
-        vx = 0;
-      } else {
-        vx = 1;
-      }
-    } else {
-      vx = 0;
-    }
-
-    if (obj_y < player_y) { // Nouvelle vitesse en Y
-      if (vy > 0) {
-        vy = 0;
-      } else {
-        vy = -1;
-      }
-    } else if (obj_y > player_y) {
-      if (vy < 0) {
-        vy = 0;
-      } else {
-        vy = 1;
-      }
-    } else {
-      vy = 0;
-    }
+  for (size_t i = 0; 1; ++i) {
+    vx = update_speed(player_x, vx, obj_x);
+    vy = update_speed(player_y, vy, obj_y);
 
     player_x += vx; // Nouvelle position
     player_y += vy; //
@@ -77,7 +70,8 @@ int main(int argc, char const *argv[]) {
     fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
 
     if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH") == 0) {
-      break;
+      fprintf(stderr, "ERREUR : Disqualifié\n");
+      return 1;
     }
 
     if (strcmp(buf, "CHECKPOINT\n") == 0) { // Récupérer le nouvel objectif
