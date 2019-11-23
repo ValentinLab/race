@@ -1,13 +1,22 @@
-CFLAGS = -Wall -g -std=c99
+CFLAGS = -Wall -g -Iinclude -std=c99
 
-TARGETS = tesla
+SHARED_OBJ = shared.o
+TARGETS = tesla slow
 
-all: $(TARGETS)
+all: libshared.a $(TARGETS)
 
-tesla: tesla.o
+libshared.a : $(SHARED_OBJ)
+	ar cr $@ $(SHARED_OBJ)
+
+tesla: tesla.o libshared.a
+	cc -o $@ tesla.o -L. -lshared -lpthread
+
+slow: slow.o libshared.a
+	cc -o $@ slow.o -L. -lshared -lpthread
 
 clean:
 	rm -f *.o
 
 mrproper: clean
-	rm $(TARGETS)
+	rm -f libshared.a
+	rm -f $(TARGETS)
