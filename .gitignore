@@ -2,8 +2,12 @@
 # Valentin Perignon (2019)
 
 # ---------- Race -------------
-race-dumb
-tesla
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+
+!race-server
 *.log
 
 # ---------- General ----------

@@ -4,7 +4,7 @@ TARGETS = tesla
 
 all: $(TARGETS)
 
-ferrari: tesla.o
+tesla: tesla.o
 
 clean:
 	rm -f *.o
