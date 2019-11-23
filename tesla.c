@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
 
     fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
 
-    if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH") == 0) {
+    if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
       break;
     }
 
