@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]) {
   int vy = 0;
 
   for (;;) {
-    print_grid(SIZE, player_x, player_y);
+    // print_grid(SIZE, player_x, player_y);
     if (obj_x < player_x) { // Nouvelle vitesse en X
       if (vx > 0) {
         vx = 0;
