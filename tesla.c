@@ -20,6 +20,7 @@ void print_grid(int size, int player_x, int player_y) {
     }
     fprintf(stderr, "\n");
   }
+}
 
 /**
  * Écrit les informations reçues du serveur concernant l'objectif
