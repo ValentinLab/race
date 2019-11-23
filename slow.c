@@ -36,8 +36,42 @@ int main(int argc, char const *argv[]) {
   int vy = 0;
 
   for (;;) {
-    // compute new player_x and new player_y
-    // TODO
+    print_grid(SIZE, player_x, player_y);
+    if (obj_x < player_x) { // Nouvelle vitesse en X
+      if (vx > 0) {
+        vx = 0;
+      } else {
+        vx = -1;
+      }
+    } else if (obj_x > player_x) {
+      if (vx < 0) {
+        vx = 0;
+      } else {
+        vx = 1;
+      }
+    } else {
+      vx = 0;
+    }
+
+    if (obj_y < player_y) { // Nouvelle vitesse en Y
+      if (vy > 0) {
+        vy = 0;
+      } else {
+        vy = -1;
+      }
+    } else if (obj_y > player_y) {
+      if (vy < 0) {
+        vy = 0;
+      } else {
+        vy = 1;
+      }
+    } else {
+      vy = 0;
+    }
+
+    player_x += vx; // Nouvelle position
+    player_y += vy; //
+
     printf("%i\n%i\n", player_x, player_y); // Envoyer les positions au serveur
 
     fgets(buf, BUFSIZE, stdin); // Récupérer la réponse du serveur
@@ -46,12 +80,10 @@ int main(int argc, char const *argv[]) {
       break;
     }
 
-    if (strcmp(buf, "CHECKPOINT") == 0) { // Récupérer le nouvel objectif
+    if (strcmp(buf, "CHECKPOINT\n") == 0) { // Récupérer le nouvel objectif
       get_obj_coords(&obj_x, &obj_y, &obj_w, &obj_h);
       continue;
     }
-
-    // TODO
   }
 
   free(grid);
