@@ -19,6 +19,7 @@ cugnot: cugnot.o libshared.a
 
 clean:
 	rm -f *.o
+	rm -f *.log
 
 mrproper: clean
 	rm -f libshared.a

@@ -39,15 +39,16 @@ int sum_1_to_n(int n) {
  * ----------------------------------------
  */
 
-void player_init(struct player *self) {
+void player_init(struct player *self, char *buf) {
   assert(self != NULL);
 
-  char buf[BUFSIZE];
+  // Position du joueur
   fgets(buf, BUFSIZE, stdin);
   self->pos_x = atoi(buf);
   fgets(buf, BUFSIZE, stdin);
   self->pos_y = atoi(buf);
 
+  // Vitesse du joueur
   self->speed_x = 0;
   self->speed_y = 0;
 }
@@ -110,10 +111,9 @@ void player_increase_speed_y(struct player *self, struct target *other) {
  * ----------------------------------------
  */
 
-void target_init(struct target *self) {
+void target_init(struct target *self, char *buf) {
   assert(self != NULL);
 
-  char buf[BUFSIZE];
   // Abscisse de l'objectif
   fgets(buf, BUFSIZE, stdin);
   self->x = atoi(buf);
@@ -132,7 +132,6 @@ void target_init(struct target *self) {
 int axis_dist_2_obj(int player_position, int obj_position) {
   return obj_position - player_position;
 }
-
 int reduce_v(int v) {
   // Si la vitesse est négative, on l'incrémente
   if (v < 0) {
@@ -141,7 +140,6 @@ int reduce_v(int v) {
   // Si la vitesse est positive, on la décrémente
   return --v;
 }
-
 int increase_v(int v, int player_position, int obj_position) {
   // Si l'objet est à gauche, on incrémente
   if (obj_position < player_position) {
@@ -150,7 +148,6 @@ int increase_v(int v, int player_position, int obj_position) {
   // Si l'objet est à droite on décrémente
   return ++v;
 }
-
 void get_obj_coords(int *x, int *y, int *w, int *h) {
   assert(x != NULL);
   assert(y != NULL);

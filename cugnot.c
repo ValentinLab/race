@@ -29,7 +29,6 @@
  */
 static void update_speed(struct player *self, struct target *other) {
   int delta = player_dist(self, other, true);
-  fprintf(stderr, "-> %d\n", delta);
 
   if (delta == 0) {
     self->speed_x = 0;
@@ -40,7 +39,6 @@ static void update_speed(struct player *self, struct target *other) {
   }
 
   delta = player_dist(self, other, false);
-  fprintf(stderr, "--> %d\n", delta);
   if (delta == 0) {
     self->speed_y = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
@@ -71,10 +69,10 @@ int main() {
   }
 
   // Récupérer la position initiale du joueur
-  player_init(&cugnot);
+  player_init(&cugnot, buf);
 
   // Récupérer les informations sur l'objectif
-  target_init(&target);
+  target_init(&target, buf);
 
   for (;;) {
     update_speed(&cugnot, &target);
@@ -86,11 +84,10 @@ int main() {
     // Récupérer la réponse du serveur
     fgets(buf, BUFSIZE, stdin);
     if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
-      fprintf(stderr, "ERREUR : Disqualifié\n");
-      return 1;
+      return 0;
     }
     if(strcmp(buf, "CHECKPOINT\n") == 0) {
-      target_init(&target);
+      target_init(&target, buf);
       continue;
     }
   }
