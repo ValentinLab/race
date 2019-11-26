@@ -19,7 +19,7 @@ static void update_speed(struct player *self, struct target *target) {
     self->speed_x = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
     player_reduce_speed_x(self);
-  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) < delta) || (delta < 0 && delta < -sum_1_to_n(self->speed_x - 1))) {
+  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
     player_increase_speed_x(self, target);
   }
 
