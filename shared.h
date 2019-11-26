@@ -87,4 +87,10 @@ void player_increase_speed_y(struct player *self, struct target *target);
  */
 void target_init(struct target *self, char *buf);
 
+/**
+ * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
+ */
+
+void target_optimise(struct target *self, const int *ground, const size_t SIZE);
+
 #endif

@@ -1,9 +1,9 @@
 #include "shared.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 /*
  * ----------------------------------------
@@ -56,10 +56,10 @@ void player_init(struct player *self, char *buf) {
 void player_update_pos(struct player *self) {
   self->pos_x += self->speed_x;
   self->pos_y += self->speed_y;
-} 
+}
 
 int player_dist(struct player *self, struct target *target, bool is_abscissa) {
-  if(is_abscissa) {
+  if (is_abscissa) {
     return target->x - self->pos_x;
   }
   return target->y - self->pos_y;
@@ -126,4 +126,25 @@ void target_init(struct target *self, char *buf) {
   // Hauteur de l'objectif
   fgets(buf, BUFSIZE, stdin);
   self->h = atoi(buf);
+}
+
+void target_optimise(struct target *self, const int *ground, const size_t SIZE) {
+  assert(self != NULL);
+  assert(ground != NULL);
+
+  int actual_target_value = ground[self->y * SIZE + self->x];
+  size_t max_obj_x = self->x + self->w;
+  size_t max_obj_y = self->y + self->h;  
+
+  for (size_t y = self->y; y < max_obj_y; ++y) {
+
+    for (size_t x = self->x; x < max_obj_x; ++x) {
+
+      if (ground[y * SIZE + x] < actual_target_value) {
+        self->x = x;
+        self->y = y;
+        actual_target_value = ground[y * SIZE + x];
+      }
+    }
+  }
 }

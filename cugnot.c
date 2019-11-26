@@ -58,7 +58,8 @@ int main() {
 
   // Récupérer les informations sur l'objectif
   target_init(&target, buf);
-
+  target_optimise(&target, grid, SIZE);
+  
   for (;;) {
     update_speed(&cugnot, &target);
     player_update_pos(&cugnot);
@@ -71,8 +72,9 @@ int main() {
     if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
       return 0;
     }
-    if(strcmp(buf, "CHECKPOINT\n") == 0) {
+    if (strcmp(buf, "CHECKPOINT\n") == 0) {
       target_init(&target, buf);
+      target_optimise(&target, grid, SIZE);
       continue;
     }
   }
