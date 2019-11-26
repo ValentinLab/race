@@ -6,45 +6,30 @@
 
 #define BUFSIZE 256
 
-/*static int update_speed(int player_axis_p, int v, int obj_axis_p) {
-  int delta = axis_dist_2_obj(player_axis_p, obj_axis_p);
-
-  if (delta == 0) {
-    return 0;
-  }
-  if ((delta > 0 && delta < sum_1_to_n(v)) || (delta < 0 && -sum_1_to_n(v) < delta)) {
-    return reduce_v(v);
-  }
-  if ((delta > 0 && sum_1_to_n(v + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(v - 1))) {
-    return increase_v(v, player_axis_p, obj_axis_p);
-  }
-  return v;
-}*/
-
 /*
  * Met à jour la vitesse du joueur
  * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
  * S'il est assez loin de l'objectif, il accélère
  * Sinon, il garde la même vitesse.
  */
-static void update_speed(struct player *self, struct target *other) {
-  int delta = player_dist(self, other, true);
+static void update_speed(struct player *self, struct target *target) {
+  int delta = player_dist(self, target, true);
 
   if (delta == 0) {
     self->speed_x = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
     player_reduce_speed_x(self);
   } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
-    player_increase_speed_x(self, other);
+    player_increase_speed_x(self, target);
   }
 
-  delta = player_dist(self, other, false);
+  delta = player_dist(self, target, false);
   if (delta == 0) {
     self->speed_y = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
     player_reduce_speed_y(self);
   } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
-    player_increase_speed_y(self, other);
+    player_increase_speed_y(self, target);
   }
 }
 

@@ -58,11 +58,11 @@ void player_update_pos(struct player *self) {
   self->pos_y += self->speed_y;
 } 
 
-int player_dist(struct player *self, struct target *other, bool is_abscissa) {
+int player_dist(struct player *self, struct target *target, bool is_abscissa) {
   if(is_abscissa) {
-    return other->x - self->pos_x;
+    return target->x - self->pos_x;
   }
-  return other->y - self->pos_y;
+  return target->y - self->pos_y;
 }
 
 void player_reduce_speed_x(struct player *self) {
@@ -85,9 +85,9 @@ void player_reduce_speed_y(struct player *self) {
   self->speed_y -= 1;
 }
 
-void player_increase_speed_x(struct player *self, struct target *other) {
+void player_increase_speed_x(struct player *self, struct target *target) {
   // Si l'objet est à gauche, on incrémente
-  if (other->x < self->pos_x) {
+  if (target->x < self->pos_x) {
     self->speed_x -= 1;
     return;
   }
@@ -95,9 +95,9 @@ void player_increase_speed_x(struct player *self, struct target *other) {
   self->speed_x += 1;
 }
 
-void player_increase_speed_y(struct player *self, struct target *other) {
+void player_increase_speed_y(struct player *self, struct target *target) {
   // Si l'objet est à gauche, on incrémente
-  if (other->y < self->pos_y) {
+  if (target->y < self->pos_y) {
     self->speed_y -= 1;
     return;
   }
@@ -127,45 +127,3 @@ void target_init(struct target *self, char *buf) {
   fgets(buf, BUFSIZE, stdin);
   self->h = atoi(buf);
 }
-
-/*
-int axis_dist_2_obj(int player_position, int obj_position) {
-  return obj_position - player_position;
-}
-int reduce_v(int v) {
-  // Si la vitesse est négative, on l'incrémente
-  if (v < 0) {
-    return ++v;
-  }
-  // Si la vitesse est positive, on la décrémente
-  return --v;
-}
-int increase_v(int v, int player_position, int obj_position) {
-  // Si l'objet est à gauche, on incrémente
-  if (obj_position < player_position) {
-    return --v;
-  }
-  // Si l'objet est à droite on décrémente
-  return ++v;
-}
-void get_obj_coords(int *x, int *y, int *w, int *h) {
-  assert(x != NULL);
-  assert(y != NULL);
-  assert(w != NULL);
-  assert(h != NULL);
-
-  char buf[BUFSIZE];
-  // Abscisse de l'objectif
-  fgets(buf, BUFSIZE, stdin);
-  *x = atoi(buf);
-  // Ordonnée de l'objectif
-  fgets(buf, BUFSIZE, stdin);
-  *y = atoi(buf);
-  // Largeur de l'objectif
-  fgets(buf, BUFSIZE, stdin);
-  *w = atoi(buf);
-  // Hauteur de l'objectif
-  fgets(buf, BUFSIZE, stdin);
-  *h = atoi(buf);
-}
-*/

@@ -56,7 +56,7 @@ void player_update_pos(struct player *self);
 /*
  * Calculer la distance entre le joueur et l'objectif
  */
-int player_dist(struct player *self, struct target *other, bool is_abscissa);
+int player_dist(struct player *self, struct target *target, bool is_abscissa);
 
 /*
  * Réduire la vitesse (axe x)
@@ -68,15 +68,13 @@ void player_reduce_speed_x(struct player *self);
  */
 void player_reduce_speed_y(struct player *self);
 
-/*
- * Augmenter la vitesse (axe x)
- */
-void player_increase_speed_x(struct player *self, struct target *other);
+/* Augmenter la vitesse (axe x) */
+void player_increase_speed_x(struct player *self, struct target *target);
 
 /*
  * Augmenter la vitesse (axe y)
  */
-void player_increase_speed_y(struct player *self, struct target *other);
+void player_increase_speed_y(struct player *self, struct target *target);
 
 /*
  * ----------------------------------------
@@ -88,23 +86,5 @@ void player_increase_speed_y(struct player *self, struct target *other);
  * Initialiser une structure target avec les valeurs envoyées par le serveur
  */
 void target_init(struct target *self, char *buf);
-
-/*
- * Lire et enregistrer les informations reçues du serveur concernant l'objectif
- */
-//void get_obj_coords(int *x, int *y, int *w, int *h);
-/*
- * Obtenir la distance sur un axe entre le joueur et l'objectif
- * > 0 si l'objectif est à droite du joueur 
- */
-//int axis_dist_2_obj(int player_position, int obj_position);
-/*
- * Réduire une vitesse de 1 (positive ou négative) 
- */
-//int reduce_v(int v);
-/*
- * Augmenter une vitesse de 1 (positive ou négative)
- */
-//int increase_v(int v, int player_position, int obj_position);
 
 #endif
