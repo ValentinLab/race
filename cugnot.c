@@ -13,17 +13,18 @@
  * Sinon, il garde la même vitesse.
  */
 static void update_speed(struct player *self, struct target *target) {
-  int delta = player_dist(self, target, true);
-
+  int delta = player_dist(self, target, true); // deltaX
+  fprintf(stderr, "DeltaX : %i\n", delta);
   if (delta == 0) {
     self->speed_x = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
     player_reduce_speed_x(self);
-  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
+  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) < delta) || (delta < 0 && delta < -sum_1_to_n(self->speed_x - 1))) {
     player_increase_speed_x(self, target);
   }
 
-  delta = player_dist(self, target, false);
+  delta = player_dist(self, target, false); // deltaY
+  fprintf(stderr, "DeltaY : %i\n", delta);
   if (delta == 0) {
     self->speed_y = 0;
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
@@ -59,8 +60,11 @@ int main() {
   // Récupérer les informations sur l'objectif
   target_init(&target, buf);
   target_optimise(&target, grid, SIZE);
-  
-  for (;;) {
+  fprintf(stderr, "Objectif optimisé : %i %i \n", target.x, target.y);
+
+  for (size_t round = 1;; ++round) {
+    fprintf(stderr, "---[ Round #%zu\n", round);
+
     update_speed(&cugnot, &target);
     player_update_pos(&cugnot);
 
@@ -75,6 +79,7 @@ int main() {
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
       target_init(&target, buf);
       target_optimise(&target, grid, SIZE);
+      fprintf(stderr, "Nouvel objectif optimisé : %i %i \n", target.x, target.y);
       continue;
     }
   }
