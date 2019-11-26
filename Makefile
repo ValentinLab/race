@@ -1,7 +1,7 @@
 CFLAGS = -Wall -g -Iinclude -std=c99
 
 SHARED_OBJ = shared.o
-TARGETS = cugnot
+TARGETS = cugnot multipla
 
 all: libshared.a $(TARGETS)
 
@@ -16,6 +16,9 @@ libshared.a : $(SHARED_OBJ)
 
 cugnot: cugnot.o libshared.a
 	cc -o $@ cugnot.o -L. -lshared -lpthread
+
+multipla: multipla.o libshared.a
+	cc -o $@ multipla.o -L. -lshared -lpthread
 
 clean:
 	rm -f *.o

@@ -105,6 +105,28 @@ void player_increase_speed_y(struct player *self, struct target *target) {
   self->speed_y += 1;
 }
 
+void update_speed(struct player *self, struct target *target) {
+  int delta = player_dist(self, target, true); // deltaX
+  fprintf(stderr, "DeltaX : %i\n", delta);
+  if (delta == 0) {
+    self->speed_x = 0;
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
+    player_reduce_speed_x(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
+    player_increase_speed_x(self, target);
+  }
+
+  delta = player_dist(self, target, false); // deltaY
+  fprintf(stderr, "DeltaY : %i\n", delta);
+  if (delta == 0) {
+    self->speed_y = 0;
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
+    player_reduce_speed_y(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
+    player_increase_speed_y(self, target);
+  }
+}
+
 /*
  * ----------------------------------------
  * Struct target
@@ -126,25 +148,4 @@ void target_init(struct target *self, char *buf) {
   // Hauteur de l'objectif
   fgets(buf, BUFSIZE, stdin);
   self->h = atoi(buf);
-}
-
-void target_optimise(struct target *self, const int *ground, const size_t SIZE) {
-  assert(self != NULL);
-  assert(ground != NULL);
-
-  int actual_target_value = ground[self->y * SIZE + self->x];
-  size_t max_obj_x = self->x + self->w;
-  size_t max_obj_y = self->y + self->h;  
-
-  for (size_t y = self->y; y < max_obj_y; ++y) {
-
-    for (size_t x = self->x; x < max_obj_x; ++x) {
-
-      if (ground[y * SIZE + x] < actual_target_value) {
-        self->x = x;
-        self->y = y;
-        actual_target_value = ground[y * SIZE + x];
-      }
-    }
-  }
 }

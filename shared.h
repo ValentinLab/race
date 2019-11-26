@@ -77,6 +77,14 @@ void player_increase_speed_x(struct player *self, struct target *target);
 void player_increase_speed_y(struct player *self, struct target *target);
 
 /*
+ * Met à jour la vitesse du joueur
+ * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est assez loin de l'objectif, il accélère
+ * Sinon, il garde la même vitesse.
+ */
+void update_speed(struct player *self, struct target *target);
+
+/*
  * ----------------------------------------
  * Struct player
  * ----------------------------------------
@@ -86,11 +94,5 @@ void player_increase_speed_y(struct player *self, struct target *target);
  * Initialiser une structure target avec les valeurs envoyées par le serveur
  */
 void target_init(struct target *self, char *buf);
-
-/**
- * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
- */
-
-void target_optimise(struct target *self, const int *ground, const size_t SIZE);
 
 #endif
