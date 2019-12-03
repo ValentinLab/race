@@ -1,27 +1,26 @@
 CFLAGS = -Wall -g -Iinclude -std=c99
 
+LIB_DIR = lib
+
 SHARED_OBJ = shared.o
 TARGETS = cugnot multipla
 
 all: libshared.a $(TARGETS)
 
-libshared.a : $(SHARED_OBJ)
-	ar cr $@ $(SHARED_OBJ)
+libshared.a : $(LIB_DIR)/$(SHARED_OBJ)
+	ar cr $@ $(LIB_DIR)/$(SHARED_OBJ)
 
-#tesla: tesla.o libshared.a
+#tesla: $(LIB_DIR)/tesla.o libshared.a
 #	cc -o $@ tesla.o -L. -lshared -lpthread
 
-#slow: slow.o libshared.a
-#	cc -o $@ slow.o -L. -lshared -lpthread
+cugnot: $(LIB_DIR)/cugnot.o libshared.a
+	cc -o $@ $(LIB_DIR)/cugnot.o -L. -lshared -lpthread
 
-cugnot: cugnot.o libshared.a
-	cc -o $@ cugnot.o -L. -lshared -lpthread
-
-multipla: multipla.o libshared.a
-	cc -o $@ multipla.o -L. -lshared -lpthread
+multipla: $(LIB_DIR)/multipla.o libshared.a
+	cc -o $@ $(LIB_DIR)/multipla.o -L. -lshared -lpthread
 
 clean:
-	rm -f *.o
+	rm -f $(LIB_DIR)/*.o
 	rm -f *.log
 
 mrproper: clean

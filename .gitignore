@@ -9,6 +9,7 @@
 
 !race-server
 !race-viewer
+!lib/
 *.log
 
 # ---------- General ----------

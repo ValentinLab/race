@@ -5,3 +5,4 @@ Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://githu
 ## Seeds pour tests
 Utilisation avec `./race-server -s seed`
 
+Cugnot disqualifié : `1508001905`
