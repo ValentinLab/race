@@ -66,23 +66,27 @@ int player_dist(struct player *self, struct target *target, bool is_abscissa) {
 }
 
 void player_reduce_speed_x(struct player *self) {
-  // Si la vitesse est négative, on l'incrémente
-  if (self->speed_x < 0) {
-    self->speed_x += 1;
-    return;
+  if (self->speed_x != 0) {
+    // Si la vitesse est négative, on l'incrémente
+    if (self->speed_x < 0) {
+      self->speed_x += 1;
+      return;
+    }
+    // Si la vitesse est positive, on la décrémente
+    self->speed_x -= 1;
   }
-  // Si la vitesse est positive, on la décrémente
-  self->speed_x -= 1;
 }
 
 void player_reduce_speed_y(struct player *self) {
-  // Si la vitesse est négative, on l'incrémente
-  if (self->speed_y < 0) {
-    self->speed_y += 1;
-    return;
+  if (self->speed_y != 0) {
+    // Si la vitesse est négative, on l'incrémente
+    if (self->speed_y < 0) {
+      self->speed_y += 1;
+      return;
+    }
+    // Si la vitesse est positive, on la décrémente
+    self->speed_y -= 1;
   }
-  // Si la vitesse est positive, on la décrémente
-  self->speed_y -= 1;
 }
 
 void player_increase_speed_x(struct player *self, struct target *target) {
@@ -109,7 +113,7 @@ void update_speed(struct player *self, struct target *target) {
   int delta = player_dist(self, target, true); // deltaX
   fprintf(stderr, "DeltaX : %i\n", delta);
   if (delta == 0) {
-    self->speed_x = 0;
+    player_reduce_speed_x(self);
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
     player_reduce_speed_x(self);
   } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
@@ -119,7 +123,7 @@ void update_speed(struct player *self, struct target *target) {
   delta = player_dist(self, target, false); // deltaY
   fprintf(stderr, "DeltaY : %i\n", delta);
   if (delta == 0) {
-    self->speed_y = 0;
+    player_reduce_speed_y(self);
   } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
     player_reduce_speed_y(self);
   } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
