@@ -19,6 +19,7 @@ struct target {
   int y;
   int w;
   int h;
+  int value;
 };
 
 /*
@@ -94,5 +95,10 @@ void update_speed(struct player *self, struct target *target);
  * Initialiser une structure target avec les valeurs envoyées par le serveur
  */
 void target_init(struct target *self, char *buf);
+
+/*
+ * Copie self dans copy
+ */
+void target_copy(const struct target *self, struct target *copy);
 
 #endif

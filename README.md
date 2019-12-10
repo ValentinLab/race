@@ -5,4 +5,6 @@ Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://githu
 ## Seeds pour tests
 Utilisation avec `./race-server -s seed`
 
-Cugnot disqualifié : `1508001905`
+[x] Cugnot disqualifié : `1508001905`
+[x] Race-hi explose multipla (points) : `577644688`
+[] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`

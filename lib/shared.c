@@ -153,3 +153,14 @@ void target_init(struct target *self, char *buf) {
   fgets(buf, BUFSIZE, stdin);
   self->h = atoi(buf);
 }
+
+void target_copy(const struct target *self, struct target *copy) {
+  assert(self != NULL);
+  assert(copy != NULL);
+
+  copy->x = self->x;
+  copy->y = self->y;
+  copy->w = self->w;
+  copy->h = self->h;
+  copy->value = self->value;
+}
