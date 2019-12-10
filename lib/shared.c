@@ -11,15 +11,11 @@
  * ----------------------------------------
  */
 
-void print_grid(int size, int player_x, int player_y) {
-  for (size_t i = 0; i < size; ++i) {
+void print_grid(const int *grid, const int SIZE) {
+  for (size_t y = 0; y < SIZE; ++y) {
     fprintf(stderr, "|");
-    for (size_t j = 0; j < size; ++j) {
-      if (i == player_x && j == player_y) {
-        fprintf(stderr, "x");
-      } else {
-        fprintf(stderr, " ");
-      }
+    for (size_t x = 0; x < SIZE; ++x) {
+      fprintf(stderr, "%i", grid[y * SIZE + x]);
       fprintf(stderr, "|");
     }
     fprintf(stderr, "\n");

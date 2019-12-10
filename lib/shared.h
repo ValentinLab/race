@@ -31,7 +31,7 @@ struct target {
 /*
  * Afficher dans stderr la grille de jeu avec la position du joueur
  */
-void print_grid(int size, int px, int py);
+void print_grid(const int* grid, const int SIZE);
 
 /*
  * Calculer la somme des |n| premiers entiers

@@ -9,6 +9,7 @@
 static void target_optimise_line(struct target *self, const int *ground, const size_t SIZE, const size_t iter_x_min, const size_t iter_x_max, const size_t iter_y_min, const size_t iter_y_max) {
   for (size_t y = iter_y_min; y <= iter_y_max; ++y) {
     for (size_t x = iter_x_min; x <= iter_x_max; ++x) {
+      fprintf(stderr, "Valeur du terrain (%zu,%zu): %i ---- Valeur actuelle de la cible %i\n", x,y, ground[y * SIZE + x], self->value);
       if (ground[y * SIZE + x] < self->value) {
         self->x = x;
         self->y = y;
@@ -134,9 +135,11 @@ int main() {
 
   // Récupérer les informations sur l'objectif
   target_init(&target, buf);
-  fprintf(stderr, "Objectif non optimisé : %i %i \n", target.x, target.y);
+  fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
   target_optimise(&target, grid, SIZE, &multipla);
-  fprintf(stderr, "Objectif optimisé : %i %i \n", target.x, target.y);
+  fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
+
+  print_grid(grid, SIZE);
 
   for (size_t round = 1;; ++round) {
     fprintf(stderr, "---[ Round #%zu\n", round);
