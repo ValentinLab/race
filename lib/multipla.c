@@ -123,6 +123,45 @@ static int target_optimise(struct target *self, struct target *temp, const int *
   return 1;
 }
 
+static void get_and_optimize_obj(struct target *real_target, struct target *target, struct player *player, char *buf, const int *grid, const int SIZE) {
+
+  struct target initial_target;
+  initial_target.x = 0;
+  initial_target.y = 0;
+  initial_target.w = 0;
+  initial_target.h = 0;
+  initial_target.value = 0;
+  target_init(&initial_target, buf);
+  fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", initial_target.x, initial_target.y, initial_target.w, initial_target.h);
+  
+  target_copy(&initial_target, real_target);
+  int status = target_optimise(real_target, target, grid, SIZE, player);
+  if (status == 0) {
+    // Pas besoin de cible temporaire
+    target_copy(real_target, target);
+    fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target->x, real_target->y, real_target->w, real_target->h);
+    return;
+  }
+
+  // Là, on regarde dans quelle configuration on se trouve. Soit (voir photo pour explication)
+  // On stocke toutes les cases par lesquelles on va passer si on ne va pas faire de détour
+  struct player pl_copy;
+  player_copy(player, &pl_copy);
+  while(target_is_player_on(&initial_target, &pl_copy)) {
+    update_speed(&pl_copy, real_target);
+    player_update_pos(&pl_copy);
+  }
+
+  if (target_is_player_on(real_target, &pl_copy)) { // Si on arrive sur la vraie cible : on a pas besoin de cible temporaire
+    target_copy(real_target, target);
+    fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target->x, real_target->y, real_target->w, real_target->h);   
+  } else { // On est du mauvais côté, on garde la cible temporaire
+    fprintf(stderr, "Nouvel objectif (temporaire) optimisé : %i %i (%ix%i)\n", target->x, target->y, target->w, target->h);
+    fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target->x, real_target->y, real_target->w, real_target->h);
+  }
+  
+}
+
 int main() {
   // Structures
   struct player multipla;
@@ -148,16 +187,7 @@ int main() {
   player_init(&multipla, buf);
 
   // Récupérer les informations sur l'objectif
-  target_init(&real_target, buf);
-  fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
-  int status = target_optimise(&real_target, &target, grid, SIZE, &multipla);
-  target_dump(&target);
-  target_dump(&real_target);
-  if (status == 0) {
-    target_copy(&target, &real_target);
-  }
-  fprintf(stderr, "Nouvel objectif (temporaire) optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
-  fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
+  get_and_optimize_obj(&real_target, &target, &multipla, buf, grid, SIZE);
 
   print_grid(grid, SIZE);
 
@@ -179,14 +209,7 @@ int main() {
       return 0;
     }
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
-      target_init(&real_target, buf);
-      fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
-      int status = target_optimise(&real_target, &target, grid, SIZE, &multipla);
-      if (status == 0) {
-        target_copy(&real_target, &target);
-      }
-      fprintf(stderr, "Nouvel objectif (temporaire) optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
-      fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
+      get_and_optimize_obj(&real_target, &target, &multipla, buf, grid, SIZE);
       continue;
     }
   }

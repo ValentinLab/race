@@ -49,6 +49,11 @@ int sum_1_to_n(int n);
  */
 void player_init(struct player *self, char *buf);
 
+/*
+ * On fait une copie wesh
+ */
+void player_copy(struct player *player, struct player *new);
+
 void target_dump(const struct target *self);
 
 /*

@@ -44,9 +44,15 @@ void player_init(struct player *self, char *buf) {
   fgets(buf, BUFSIZE, stdin);
   self->pos_y = atoi(buf);
 
-  // Vitesse du joueur
   self->speed_x = 0;
   self->speed_y = 0;
+}
+
+void player_copy(struct player *player, struct player *new) {
+  new->pos_x = player->pos_x;
+  new->pos_x = player->pos_y;
+  new->speed_x = player->speed_x;
+  new->speed_y = player->speed_y;
 }
 
 void player_update_pos(struct player *self) {
@@ -136,22 +142,28 @@ void update_speed(struct player *self, struct target *target) {
 void target_init(struct target *self, char *buf) {
   assert(self != NULL);
 
+  fprintf(stderr, "Buffer 0 : %s\n", buf);
   // Abscisse de l'objectif
   fgets(buf, BUFSIZE, stdin);
+  fprintf(stderr, "Buffer 1 : %s\n", buf);
   self->x = atoi(buf);
   // Ordonnée de l'objectif
   fgets(buf, BUFSIZE, stdin);
+  fprintf(stderr, "Buffer 2 : %s\n", buf);
   self->y = atoi(buf);
   // Largeur de l'objectif
   fgets(buf, BUFSIZE, stdin);
+  fprintf(stderr, "Buffer 3 : %s\n", buf);
   self->w = atoi(buf);
   // Hauteur de l'objectif
   fgets(buf, BUFSIZE, stdin);
+  fprintf(stderr, "Buffer 4 : %s\n", buf);
+
   self->h = atoi(buf);
 }
 
 void target_dump(const struct target *self) {
-  fprintf(stderr,"Cible : %i %i (%ix%i)\n", self->x, self->y, self->w, self->h);
+  fprintf(stderr, "Cible : %i %i (%ix%i)\n", self->x, self->y, self->w, self->h);
 }
 
 void target_copy(const struct target *self, struct target *copy) {
