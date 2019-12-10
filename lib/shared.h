@@ -49,6 +49,8 @@ int sum_1_to_n(int n);
  */
 void player_init(struct player *self, char *buf);
 
+void target_dump(const struct target *self);
+
 /*
  * Mettre à jour la position du joueur
  */
@@ -101,4 +103,8 @@ void target_init(struct target *self, char *buf);
  */
 void target_copy(const struct target *self, struct target *copy);
 
+/*
+ * Renvoie vrai si le joueur est dans la cible
+ */
+bool target_is_player_on(const struct target *self, const struct player *player);
 #endif

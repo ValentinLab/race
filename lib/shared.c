@@ -150,6 +150,10 @@ void target_init(struct target *self, char *buf) {
   self->h = atoi(buf);
 }
 
+void target_dump(const struct target *self) {
+  fprintf(stderr,"Cible : %i %i (%ix%i)\n", self->x, self->y, self->w, self->h);
+}
+
 void target_copy(const struct target *self, struct target *copy) {
   assert(self != NULL);
   assert(copy != NULL);
@@ -159,4 +163,8 @@ void target_copy(const struct target *self, struct target *copy) {
   copy->w = self->w;
   copy->h = self->h;
   copy->value = self->value;
+}
+
+bool target_is_player_on(const struct target *self, const struct player *player) {
+  return (self->x <= player->pos_x && player->pos_x <= self->x + self->w && self->y <= player->pos_y && player->pos_y <= self->y + self->h);
 }

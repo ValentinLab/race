@@ -9,7 +9,6 @@
 static void target_optimise_line(struct target *self, const int *ground, const size_t SIZE, const size_t iter_x_min, const size_t iter_x_max, const size_t iter_y_min, const size_t iter_y_max) {
   for (size_t y = iter_y_min; y <= iter_y_max; ++y) {
     for (size_t x = iter_x_min; x <= iter_x_max; ++x) {
-      fprintf(stderr, "Valeur du terrain (%zu,%zu): %i ---- Valeur actuelle de la cible %i\n", x,y, ground[y * SIZE + x], self->value);
       if (ground[y * SIZE + x] < self->value) {
         self->x = x;
         self->y = y;
@@ -56,8 +55,9 @@ static void target_right(struct target *self, const struct target *initial_targe
 
 /**
  * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
+ * Retourne 1 si on utilise target temp
  */
-static void target_optimise(struct target *self, const int *ground, const size_t SIZE, const struct player *player) {
+static int target_optimise(struct target *self, struct target *temp, const int *ground, const size_t SIZE, const struct player *player) {
   self->value = 0x7FFFFFFF;
   struct target initial_target;
   target_copy(self, &initial_target);
@@ -67,22 +67,22 @@ static void target_optimise(struct target *self, const int *ground, const size_t
 
   if (self->x <= player->pos_x && player->pos_x <= max_obj_x && player->pos_y < self->y) { // Partie supérieure
     target_top(self, &initial_target, ground, SIZE, player);
-    return;
+    return 0;
   }
 
   if (self->x <= player->pos_x && player->pos_x <= max_obj_x && max_obj_y < player->pos_y) { // Partie inférieure
     target_bottom(self, &initial_target, ground, SIZE, player);
-    return;
+    return 0;
   }
 
   if (self->y <= player->pos_y && player->pos_y <= max_obj_y && player->pos_x < self->x) { // Partie gauche
     target_left(self, &initial_target, ground, SIZE, player);
-    return;
+    return 0;
   }
 
   if (self->y <= player->pos_y && player->pos_y <= max_obj_y && max_obj_x < player->pos_x) { // Partie droite
     target_right(self, &initial_target, ground, SIZE, player);
-    return;
+    return 0;
   }
 
   // Cas diagonales
@@ -91,28 +91,42 @@ static void target_optimise(struct target *self, const int *ground, const size_t
 
     if (player->pos_x < self->x) { // Supérieure gauche
       target_left(self, &initial_target, ground, SIZE, player);
-      return;
+      target_copy(self, temp);
+      --temp->x;
+      --temp->y;
+      return 1;
     }
 
     // Supérieure droite
     target_right(self, &initial_target, ground, SIZE, player);
-    return;
+    target_copy(self, temp);
+    ++temp->x;
+    --temp->y;
+    return 1;
   }
 
   // Inférieure
   target_bottom(self, &initial_target, ground, SIZE, player);
   if (player->pos_x < self->x) { // Inférieure gauche
     target_left(self, &initial_target, ground, SIZE, player);
-    return;
+    target_copy(self, temp);
+    --temp->x;
+    ++temp->y;
+    return 1;
   }
 
   // Inférieure droite
   target_right(self, &initial_target, ground, SIZE, player);
+  target_copy(self, temp);
+  ++temp->x;
+  ++temp->y;
+  return 1;
 }
 
 int main() {
   // Structures
   struct player multipla;
+  struct target real_target;
   struct target target;
 
   // Création du buffer
@@ -134,10 +148,16 @@ int main() {
   player_init(&multipla, buf);
 
   // Récupérer les informations sur l'objectif
-  target_init(&target, buf);
-  fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
-  target_optimise(&target, grid, SIZE, &multipla);
-  fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
+  target_init(&real_target, buf);
+  fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
+  int status = target_optimise(&real_target, &target, grid, SIZE, &multipla);
+  target_dump(&target);
+  target_dump(&real_target);
+  if (status == 0) {
+    target_copy(&target, &real_target);
+  }
+  fprintf(stderr, "Nouvel objectif (temporaire) optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
+  fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
 
   print_grid(grid, SIZE);
 
@@ -146,6 +166,9 @@ int main() {
 
     update_speed(&multipla, &target);
     player_update_pos(&multipla);
+    if (target_is_player_on(&target, &multipla)) {
+      target_copy(&real_target, &target);
+    }
 
     // Envoyer les positions au serveur
     printf("%i\n%i\n", multipla.pos_x, multipla.pos_y);
@@ -156,10 +179,14 @@ int main() {
       return 0;
     }
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
-      target_init(&target, buf);
-      fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
-      target_optimise(&target, grid, SIZE, &multipla);
-      fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
+      target_init(&real_target, buf);
+      fprintf(stderr, "Objectif non optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
+      int status = target_optimise(&real_target, &target, grid, SIZE, &multipla);
+      if (status == 0) {
+        target_copy(&real_target, &target);
+      }
+      fprintf(stderr, "Nouvel objectif (temporaire) optimisé : %i %i (%ix%i)\n", target.x, target.y, target.w, target.h);
+      fprintf(stderr, "Nouvel objectif optimisé : %i %i (%ix%i)\n", real_target.x, real_target.y, real_target.w, real_target.h);
       continue;
     }
   }
