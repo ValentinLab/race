@@ -32,3 +32,6 @@
 
 # ---------- VisualStudioCode ----------
 .vscode/*
+
+# ---------- Mon mac le meilleur ----------
+.DS_Store
