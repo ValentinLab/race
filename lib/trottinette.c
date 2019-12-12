@@ -1,36 +1,67 @@
 #include "shared.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define BUFSIZE 256
 
-/**
- * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
- */
-static void target_optimise(struct target *self, const int *ground, const size_t SIZE) {
-  int actual_target_value = ground[self->y * SIZE + self->x];
-  size_t max_obj_x = self->x + self->w;
-  size_t max_obj_y = self->y + self->h;  
+static void accelerate_toward_target(struct player *self, struct target *target, bool *accelerated_x, bool *accelerated_y) {
+  int delta = player_dist(self, target, true); // deltaX
+  fprintf(stderr, "DeltaX : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_x(self);
+    *accelerated_x = false;
+  } else {
+    player_increase_speed_x(self, target);
+    *accelerated_x = true;
+  }
+  // if (delta == 0) {
+  //   player_reduce_speed_x(self);
+  // } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
+  //   player_reduce_speed_x(self);
+  // } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
+  //   player_increase_speed_x(self, target);
+  // }
 
-  for (size_t y = self->y; y < max_obj_y; ++y) {
+  delta = player_dist(self, target, false); // deltaY
+  fprintf(stderr, "DeltaY : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_y(self);
+    *accelerated_y = false;
+  } else {
+    player_increase_speed_y(self, target);
+    *accelerated_y = true;
+  }
+  // if (delta == 0) {
+  //   player_reduce_speed_y(self);
+  // } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
+  //   player_reduce_speed_y(self);
+  // } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
+  //   player_increase_speed_y(self, target);
+  // }
+}
 
-    for (size_t x = self->x; x < max_obj_x; ++x) {
+static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
+  if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
+    player_reduce_speed_x(self);
+    if ((self->speed_x < 0 && self->pos_x < sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < sum_1_to_n(self->speed_x))) {
+      player_reduce_speed_x(self);
+    }
+  }
 
-      if (ground[y * SIZE + x] < actual_target_value) {
-        self->x = x;
-        self->y = y;
-        actual_target_value = ground[y * SIZE + x];
-      }
+  if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
+    player_reduce_speed_y(self);
+    if ((self->speed_y < 0 && self->pos_y < sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < sum_1_to_n(self->speed_y))) {
+      player_reduce_speed_y(self);
     }
   }
 }
 
-
 int main() {
   // Structures
-  struct player cugnot;
+  struct player trottinette;
   struct target target;
 
   // Création du buffer
@@ -49,21 +80,23 @@ int main() {
   }
 
   // Récupérer la position initiale du joueur
-  player_init(&cugnot, buf);
+  player_init(&trottinette, buf);
+  bool accelerated_x = false;
+  bool accelerated_y = false;
 
   // Récupérer les informations sur l'objectif
   target_init(&target, buf);
-  target_optimise(&target, grid, SIZE);
-  fprintf(stderr, "Objectif optimisé : %i %i \n", target.x, target.y);
+  target_dump(&target);
 
   for (size_t round = 1;; ++round) {
     fprintf(stderr, "---[ Round #%zu\n", round);
 
-    update_speed(&cugnot, &target);
-    player_update_pos(&cugnot);
+    accelerate_toward_target(&trottinette, &target, &accelerated_x, &accelerated_y);
+    slow_down_to_avoid_borders(&trottinette, SIZE, accelerated_x, accelerated_y);
+    player_update_pos(&trottinette);
 
     // Envoyer les positions au serveur
-    printf("%i\n%i\n", cugnot.pos_x, cugnot.pos_y);
+    printf("%i\n%i\n", trottinette.pos_x, trottinette.pos_y);
 
     // Récupérer la réponse du serveur
     fgets(buf, BUFSIZE, stdin);
@@ -72,8 +105,7 @@ int main() {
     }
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
       target_init(&target, buf);
-      target_optimise(&target, grid, SIZE);
-      fprintf(stderr, "Nouvel objectif optimisé : %i %i \n", target.x, target.y);
+      target_dump(&target);
       continue;
     }
   }
