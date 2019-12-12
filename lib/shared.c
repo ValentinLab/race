@@ -22,10 +22,15 @@ void print_grid(const int *grid, const int SIZE) {
   }
 }
 
-int sum_1_to_n(int n) {
-  if (n < 0) { // valeur absolue
-    n = -n;
+int absol(int n) {
+  if (n < 0) {
+    return -n;
   }
+  return n;
+}
+
+int sum_1_to_n(int n) {
+  n = absol(n);
   return (n * (n + 1)) / 2;
 }
 

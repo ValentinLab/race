@@ -34,6 +34,11 @@ struct target {
 void print_grid(const int *grid, const int SIZE);
 
 /*
+ * Retourner la valeur absolue de n
+ */
+int absol(int n);
+
+/*
  * Calculer la somme des |n| premiers entiers
  */
 int sum_1_to_n(int n);
