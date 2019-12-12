@@ -6,45 +6,40 @@
 #include <string.h>
 
 #define BUFSIZE 256
+#define IS_BETWEEN(x, alpha, omega)  (((alpha) <= (x)) && ((x) <= (omega)))
 
 static void accelerate_toward_target(struct player *self, struct target *target, bool *accelerated_x, bool *accelerated_y) {
-  int delta = player_dist(self, target, true); // deltaX
-  fprintf(stderr, "DeltaX : %i\n", delta);
-  if (delta == 0) {
+  int brake_dist_x = sum_1_to_n(self->speed_x);
+  int x_if_we_brake_now = self->pos_x + brake_dist_x;
+  if (self->speed_x < 0) {
+    x_if_we_brake_now = self->pos_x - brake_dist_x;
+  }
+  if (IS_BETWEEN(x_if_we_brake_now, target->x, target->xright)) {
     player_reduce_speed_x(self);
-    *accelerated_x = false;
   } else {
     player_increase_speed_x(self, target);
-    *accelerated_x = true;
   }
-  // if (delta == 0) {
-  //   player_reduce_speed_x(self);
-  // } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
-  //   player_reduce_speed_x(self);
-  // } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
-  //   player_increase_speed_x(self, target);
-  // }
+  
 
-  delta = player_dist(self, target, false); // deltaY
-  fprintf(stderr, "DeltaY : %i\n", delta);
-  if (delta == 0) {
+  int brake_dist_y = sum_1_to_n(self->speed_y);
+  int y_if_we_brake_now = self->pos_y + brake_dist_y;
+  if (self->speed_y < 0) {
+    y_if_we_brake_now = self->pos_y - brake_dist_y;
+  }
+  if (IS_BETWEEN(y_if_we_brake_now, target->y, target->ybottom)) {
     player_reduce_speed_y(self);
-    *accelerated_y = false;
   } else {
     player_increase_speed_y(self, target);
-    *accelerated_y = true;
   }
-  // if (delta == 0) {
-  //   player_reduce_speed_y(self);
-  // } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
-  //   player_reduce_speed_y(self);
-  // } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
-  //   player_increase_speed_y(self, target);
-  // }
+
+  target_dump(target);
+  fprintf(stderr, "Arrivée du joueur sur %i %i\n", x_if_we_brake_now, y_if_we_brake_now);
+
 }
 
 static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
   if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
+    // assert(false);
     player_reduce_speed_x(self);
     if ((self->speed_x < 0 && self->pos_x < sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < sum_1_to_n(self->speed_x))) {
       player_reduce_speed_x(self);
@@ -52,6 +47,7 @@ static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE,
   }
 
   if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
+    // assert(false);
     player_reduce_speed_y(self);
     if ((self->speed_y < 0 && self->pos_y < sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < sum_1_to_n(self->speed_y))) {
       player_reduce_speed_y(self);

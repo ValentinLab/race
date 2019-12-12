@@ -165,12 +165,13 @@ void target_init(struct target *self, char *buf) {
   fgets(buf, BUFSIZE, stdin);
 
   self->h = atoi(buf);
-
+  self->xright = self->x + self->w - 1;
+  self->ybottom = self->y + self->h - 1;
   self->value = 0x7FFFFFFF;
 }
 
 void target_dump(const struct target *self) {
-  fprintf(stderr, "Cible : %i %i (%ix%i) value %i\n", self->x, self->y, self->w, self->h, self->value);
+  fprintf(stderr, "Cible : %i %i to %i %i (%ix%i) value %i\n", self->x, self->y, self->xright, self->ybottom, self->w, self->h, self->value);
 }
 
 void target_copy(const struct target *self, struct target *copy) {
@@ -181,6 +182,8 @@ void target_copy(const struct target *self, struct target *copy) {
   copy->y = self->y;
   copy->w = self->w;
   copy->h = self->h;
+  copy->xright = self->xright;
+  copy->ybottom = self->ybottom;
   copy->value = 0x7FFFFFFF;
 }
 

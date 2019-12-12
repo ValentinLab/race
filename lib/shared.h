@@ -19,6 +19,8 @@ struct target {
   int y;
   int w;
   int h;
+  int xright;
+  int ybottom;
   int value;
 };
 
