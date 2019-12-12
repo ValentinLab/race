@@ -3,7 +3,7 @@ CFLAGS = -Wall -g -Iinclude -std=c99
 LIB_DIR = lib
 
 SHARED_OBJ = shared.o
-TARGETS = cugnot multipla
+TARGETS = cugnot multipla trottinette
 
 all: libshared.a $(TARGETS)
 
@@ -18,6 +18,9 @@ cugnot: $(LIB_DIR)/cugnot.o libshared.a
 
 multipla: $(LIB_DIR)/multipla.o libshared.a
 	cc -o $@ $(LIB_DIR)/multipla.o -L. -lshared -lpthread
+
+trottinette: $(LIB_DIR)/trottinette.o libshared.a
+	cc -o $@ $(LIB_DIR)/trottinette.o -L. -lshared -lpthread
 
 clean:
 	rm -f $(LIB_DIR)/*.o

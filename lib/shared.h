@@ -1,8 +1,8 @@
 #ifndef SHARED_H
 #define SHARED_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define BUFSIZE 256
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
@@ -31,7 +31,7 @@ struct target {
 /*
  * Afficher dans stderr la grille de jeu avec la position du joueur
  */
-void print_grid(const int* grid, const int SIZE);
+void print_grid(const int *grid, const int SIZE);
 
 /*
  * Calculer la somme des |n| premiers entiers
@@ -49,10 +49,12 @@ int sum_1_to_n(int n);
  */
 void player_init(struct player *self, char *buf);
 
+void player_dump(const struct player *self);
+
 /*
  * On fait une copie wesh
  */
-void player_copy(struct player *player, struct player *new);
+void player_copy(struct player *self, struct player *copy);
 
 void target_dump(const struct target *self);
 
@@ -102,6 +104,8 @@ void update_speed(struct player *self, struct target *target);
  * Initialiser une structure target avec les valeurs envoyées par le serveur
  */
 void target_init(struct target *self, char *buf);
+
+void target_dump(const struct target *self);
 
 /*
  * Copie self dans copy

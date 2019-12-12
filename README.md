@@ -7,4 +7,5 @@ Utilisation avec `./race-server -s seed ./joueur`
 
 - [x] Cugnot disqualifié : `1508001905`
 - [x] Race-hi explose multipla (points) : `577644688`
-- [ ] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
+- [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
+- [ ] Race-hi explose multipla (trajectoire) : `1697104660`
