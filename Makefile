@@ -21,7 +21,7 @@ multipla: $(LIB_DIR)/multipla.o libshared.a
 
 clean:
 	rm -f $(LIB_DIR)/*.o
-	rm -f *.log
+	rm -f *.log*
 
 mrproper: clean
 	rm -f libshared.a
