@@ -3,7 +3,7 @@ CFLAGS = -Wall -g -Iinclude -std=c99
 LIB_DIR = lib
 
 SHARED_OBJ = shared.o
-TARGETS = cugnot multipla trottinette
+TARGETS = stats-for-race cugnot multipla trottinette
 
 all: libshared.a $(TARGETS)
 
@@ -12,6 +12,8 @@ libshared.a : $(LIB_DIR)/$(SHARED_OBJ)
 
 #tesla: $(LIB_DIR)/tesla.o libshared.a
 #	cc -o $@ tesla.o -L. -lshared -lpthread
+
+stats-for-race: stats-for-race.o
 
 cugnot: $(LIB_DIR)/cugnot.o libshared.a
 	cc -o $@ $(LIB_DIR)/cugnot.o -L. -lshared -lpthread
@@ -24,6 +26,7 @@ trottinette: $(LIB_DIR)/trottinette.o libshared.a
 
 clean:
 	rm -f $(LIB_DIR)/*.o
+	rm -f *.o
 	rm -f *.log*
 
 mrproper: clean
