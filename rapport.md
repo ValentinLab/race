@@ -19,7 +19,7 @@ L'algorithme sélectionne la case avec le plus faible poid en réduisant la rech
 Il existe deux cas. Soit le joueur arrive face à l'objectif (depuis la gauche, la droite, le haut ou le bas), dans ce cas la recherche se limite à une ligne ou colonne. Soit le joueur arrive depuis une diagonale, dans ce cas la recherche se fait sur une diagonale et une colonne.
 
 *Exemple (O = le joueur, xx = cases de recherche) :*
-
+```
 Cas 1 :              Cas 2 :
 
                      O
@@ -31,3 +31,4 @@ O    |xx|  |  |             |xx|  |  |
      ----------             ----------
      |xx|  |  |             |xx|  |  |
      ----------             ----------
+```
