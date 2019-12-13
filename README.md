@@ -13,4 +13,4 @@ Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://githu
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
 - [ ] Race-hi explose multipla (trajectoire) : `1697104660`
 
-- [ ] Trottinette disqualifié : `3050529712`
+- [x] Trottinette disqualifié : `3050529712`

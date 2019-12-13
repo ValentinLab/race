@@ -40,14 +40,14 @@ static void accelerate_toward_target(struct player *self, struct target *target,
 
 static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
   if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
-    if(!accelerated_x) {
+    if(accelerated_x) {
       player_reduce_speed_x(self);
     }
     player_reduce_speed_x(self);
   }
 
   if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
-    if(!accelerated_y) {
+    if(accelerated_y) {
       player_reduce_speed_y(self);
     }
     player_reduce_speed_y(self);
