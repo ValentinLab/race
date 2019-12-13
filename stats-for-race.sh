@@ -32,8 +32,9 @@ echo -e "\e[36mNombre d'itérations : $iteration_nb \e[39m"
 players=$p1_name" "$p2_name" "$p3_name" "$p4_name
 for i in `seq 1 $iteration_nb`; do
     echo -e "\e[36mItération numéro $i \e[39m"
-    ./race-server $players >> stats.log
+    ./race-server $players >> stats.log 2> trash.log
 done
+rm trash.log
 
 lines_to_delete_nb=$(expr $player_nb + 3)
 for i in `seq 1 $iteration_nb`; do
