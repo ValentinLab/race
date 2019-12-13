@@ -18,9 +18,9 @@ static void accelerate_toward_target(struct player *self, struct target *target,
     player_reduce_speed_x(self);
   } else {
     player_increase_speed_x(self, target);
+    *accelerated_x = true;
   }
   
-
   int brake_dist_y = sum_1_to_n(self->speed_y);
   int y_if_we_brake_now = self->pos_y + brake_dist_y;
   if (self->speed_y < 0) {
@@ -30,6 +30,7 @@ static void accelerate_toward_target(struct player *self, struct target *target,
     player_reduce_speed_y(self);
   } else {
     player_increase_speed_y(self, target);
+    *accelerated_y = true;
   }
 
   target_dump(target);
@@ -39,19 +40,17 @@ static void accelerate_toward_target(struct player *self, struct target *target,
 
 static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
   if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
-    // assert(false);
-    player_reduce_speed_x(self);
-    if ((self->speed_x < 0 && self->pos_x < sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < sum_1_to_n(self->speed_x))) {
+    if(!accelerated_x) {
       player_reduce_speed_x(self);
     }
+    player_reduce_speed_x(self);
   }
 
   if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
-    // assert(false);
-    player_reduce_speed_y(self);
-    if ((self->speed_y < 0 && self->pos_y < sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < sum_1_to_n(self->speed_y))) {
+    if(!accelerated_y) {
       player_reduce_speed_y(self);
     }
+    player_reduce_speed_y(self);
   }
 }
 
