@@ -29,12 +29,15 @@ p4_name=$5
 echo -e "\e[91mStatistiques pour Race"
 echo -e "\e[36mNombre d'itérations : $iteration_nb \e[39m"
 
+if [ -e error-server.log ]; then
+    rm error-server.log
+fi
+
 players=$p1_name" "$p2_name" "$p3_name" "$p4_name
 for i in `seq 1 $iteration_nb`; do
-    echo -e "\e[36mItération numéro $i \e[39m"
-    ./race-server $players >> stats.log 2> trash.log
+    echo -e "\e[36m---Itération numéro $i \e[39m"
+    ./race-server $players >> stats.log 2>> error-server.log
 done
-rm trash.log
 
 lines_to_delete_nb=$(expr $player_nb + 3)
 for i in `seq 1 $iteration_nb`; do
@@ -65,13 +68,14 @@ p4_victories=0
 
 for i in `seq 1 $iteration_nb`; do
     for j in `seq 1 $player_nb`; do
-        number=$(expr $i \* $j)
-        echo -e "\e[36mTraitement de la participation n°$number \e[39m"
+        number=$(expr $(expr $i - 1) \* $player_nb + $j)
 
         player=$(tail -n 1 stats.log | cut -d' ' -f2 | rev | cut -c 2- | rev)
 
         is_disqualified=$(tail -n 1 stats.log | grep 'DISQUALIFIED!')
-        if [ -n $is_disqualified ]; then
+        if [ -n "$is_disqualified" ]; then
+            echo -e "\e[36mTraitement de la participation n°$number ~ \e[91mOh nooon : $player DISQUALIFIÉ ! \e[39m"
+        else 
             total=$(tail -n 1 stats.log | cut -d' ' -f3)
             moves=$(tail -n 1 stats.log | cut -d' ' -f5 | rev | cut -c 2- | rev)
             score=$(tail -n 1 stats.log | cut -d' ' -f7 | rev | cut -c 2- | rev)
@@ -112,10 +116,7 @@ for i in `seq 1 $iteration_nb`; do
                     fi
             fi
 
-            echo -e "Résultat : $player $total $moves $score"
-
-        else 
-            echo -e "Argh : $player DISQUALIFIÉ ! "
+            echo -e "\e[36mTraitement de la participation n°$number ~ \e[39mRésultat : $player $total (moves: $moves, score: $score)"
         fi 
         head -n -1 stats.log > temp.txt
         mv temp.txt stats.log
