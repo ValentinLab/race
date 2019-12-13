@@ -1,7 +1,13 @@
 #!/bin/bash
 
 # Titre
-echo -e "# Classement de ./$1 ($2 exécution)\n"
+echo -e "Classement de ./$1\n"
+
+# Vérifier les paramètres
+if [ $# -ne 2 ]; then
+  echo "Erreur : Nombre de paramètres incorrecte."
+  exit
+fi
 
 # Créer un dossier tmp
 mkdir tmp
