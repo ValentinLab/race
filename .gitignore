@@ -7,9 +7,12 @@
 # Unignore all with extensions
 !*.*
 
+!viewer-simple
+!stats-for-race
 !race-server
 !race-viewer
 !lib/
+!scripts_sources/*.sh
 *.log
 
 # ---------- General ----------
