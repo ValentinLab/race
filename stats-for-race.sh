@@ -151,4 +151,6 @@ else
 fi
 echo ""
 
-rm stats.log
+if [ -e stats.log ]; then
+    rm stats.log
+fi
