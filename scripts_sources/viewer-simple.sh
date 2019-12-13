@@ -5,7 +5,7 @@ if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
         echo "Made by Nathanaël H."
         echo ""
         echo "  Usage :"
-        echo "      viewer-simple <player1> [player2] [player3] [player4]"
+        echo "      viewer-simple [-s seed] <player1> [player2] [player3] [player4]"
         echo "      viewer-simple (-h | --help)"
         echo ""
         echo "  Options : "
@@ -13,13 +13,13 @@ if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
         exit 0
     fi
 
-if [ "$#" -lt 1 ] || [ "$#" -gt 4 ] ; then
+if [ "$#" -lt 1 ] || [ "$#" -gt 6 ] ; then
     echo -e "\e[91mviewer-simple : Illegal number of parameters.\e[39m Please try 'viewer-simple --help'"
     exit 0
 fi
 
-players=$1" "$2" "$3" "$4
+args=$1" "$2" "$3" "$4" "$5" "$6
 
-./race-viewer & (sleep 1 && ./race-server $players) && fg
+./race-viewer & (sleep 1 && ./race-server $args) && fg
 
 exit 0
