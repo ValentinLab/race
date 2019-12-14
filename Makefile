@@ -30,3 +30,18 @@ clean:
 mrproper: clean
 	rm -f libshared.a
 	rm -f $(TARGETS)
+
+ARCHIVE_DIR = nhoun_vperignon
+
+archive: mrproper
+	test "$(LIB_DIR)" = "lib"
+	rm -rf $(ARCHIVE_DIR)
+	mkdir $(ARCHIVE_DIR)
+	cp -r lib Makefile race-server race-viewer $(ARCHIVE_DIR)
+	cp rapport/*.png ./
+	pandoc -f markdown -S -s -N -Vsecnumdepth=4 -t latex -V geometry:margin=3.5cm -V lang=fr rapport/rapport.md -o rapport.pdf
+	rm -f *.png
+	mv rapport.pdf $(ARCHIVE_DIR) 
+	tar zcvf $(ARCHIVE_DIR).tar.gz $(ARCHIVE_DIR)
+	rm -rf $(ARCHIVE_DIR)
+

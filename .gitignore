@@ -16,6 +16,7 @@
 !scripts_sources/*.sh
 *.log
 *.xcf
+*.tar.gz
 # ---------- General ----------
 
 # Executables
