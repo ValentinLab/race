@@ -34,6 +34,14 @@ int sum_1_to_n(int n) {
   return (n * (n + 1)) / 2;
 }
 
+int coord_if_we_break_now(int pos, int speed) {
+  if (speed > 0) {
+    return pos + sum_1_to_n(speed);
+  }
+
+  return pos - sum_1_to_n(speed);
+}
+
 /*
  * ----------------------------------------
  * Struct player
@@ -70,7 +78,7 @@ void player_update_pos(struct player *self) {
   self->pos_y += self->speed_y;
 }
 
-int player_dist(struct player *self, struct target *target, bool is_abscissa) {
+int player_dist(const struct player *self, const struct target *target, bool is_abscissa) {
   if (is_abscissa) {
     return target->x - self->pos_x;
   }
@@ -141,6 +149,42 @@ void update_speed(struct player *self, struct target *target) {
   } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
     player_increase_speed_y(self, target);
   }
+}
+
+bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target) {
+  int x_if_we_brake_now = coord_if_we_break_now(self->pos_x, self->speed_x);
+  return (target->x <= x_if_we_brake_now && x_if_we_brake_now <= target->xright);
+}
+
+bool is_on_target_Y_if_brake_now(const struct player *self, const struct target *target) {
+  int y_if_we_brake_now = coord_if_we_break_now(self->pos_y, self->speed_y);
+  return (target->y <= y_if_we_brake_now && y_if_we_brake_now <= target->ybottom);
+}
+
+bool if_overshooting_target_X_if_brake_now(const struct player *self, const struct target *target) {
+  int x_if_we_brake_now = coord_if_we_break_now(self->pos_x, self->speed_x);
+  return ((self->pos_x < target->x && target->xright < x_if_we_brake_now) || (target->xright < self->pos_x && x_if_we_brake_now < target->x));
+}
+
+bool if_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target) {
+  int y_if_we_brake_now = coord_if_we_break_now(self->pos_y, self->speed_y);
+  return ((self->pos_y < target->y && target->ybottom < y_if_we_brake_now) || (target->ybottom < self->pos_y && y_if_we_brake_now < target->y));
+}
+
+bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
+  int delta = player_dist(self, target, true); // deltaX
+  if ((self->speed_x < 0 && self->pos_x < target->x) || (self->speed_x > 0 && target->xright < self->pos_x)) {
+    return false;
+  }
+  return (self->speed_x != 0 && (delta % self->speed_x) == 0);
+}
+
+bool will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target) {
+  int delta = player_dist(self, target, false); // deltaY
+  if ((self->speed_y < 0 && self->pos_y < target->y) || (self->speed_y > 0 && target->ybottom < self->pos_y)) {
+    return false;
+  }
+  return (self->speed_y != 0 && (delta % self->speed_y) == 0);
 }
 
 /*

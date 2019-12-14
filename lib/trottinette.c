@@ -6,48 +6,50 @@
 #include <string.h>
 
 #define BUFSIZE 256
-#define IS_BETWEEN(x, alpha, omega)  (((alpha) <= (x)) && ((x) <= (omega)))
+#define IS_BETWEEN(x, alpha, omega) (((alpha) <= (x)) && ((x) <= (omega)))
 
 static void accelerate_toward_target(struct player *self, struct target *target, bool *accelerated_x, bool *accelerated_y) {
-  int brake_dist_x = sum_1_to_n(self->speed_x);
-  int x_if_we_brake_now = self->pos_x + brake_dist_x;
-  if (self->speed_x < 0) {
-    x_if_we_brake_now = self->pos_x - brake_dist_x;
-  }
-  if (IS_BETWEEN(x_if_we_brake_now, target->x, target->xright)) {
-    player_reduce_speed_x(self);
-  } else {
-    player_increase_speed_x(self, target);
-    *accelerated_x = true;
-  }
-  
-  int brake_dist_y = sum_1_to_n(self->speed_y);
-  int y_if_we_brake_now = self->pos_y + brake_dist_y;
-  if (self->speed_y < 0) {
-    y_if_we_brake_now = self->pos_y - brake_dist_y;
-  }
-  if (IS_BETWEEN(y_if_we_brake_now, target->y, target->ybottom)) {
-    player_reduce_speed_y(self);
-  } else {
-    player_increase_speed_y(self, target);
-    *accelerated_y = true;
+  if (!will_player_touch_target_X_with_current_speed(self, target)) {
+    if (is_on_target_X_if_brake_now(self, target)) {
+      player_reduce_speed_x(self);
+      *accelerated_x = false;
+    } else {
+      player_increase_speed_x(self, target);
+      if (if_overshooting_target_X_if_brake_now(self, target)) {
+        player_reduce_speed_x(self);
+        *accelerated_x = false;
+      } else {
+        *accelerated_x = true;
+      }
+    }
   }
 
-  target_dump(target);
-  fprintf(stderr, "Arrivée du joueur sur %i %i\n", x_if_we_brake_now, y_if_we_brake_now);
-
+  if (!will_player_touch_target_Y_with_current_speed(self, target)) {
+    if (is_on_target_Y_if_brake_now(self, target)) {
+      player_reduce_speed_y(self);
+      *accelerated_y = false;
+    } else {
+      player_increase_speed_y(self, target);
+      if (if_overshooting_target_Y_if_brake_now(self, target)) {
+        player_reduce_speed_y(self);
+        *accelerated_y = false;
+      } else {
+        *accelerated_y = true;
+      }
+    }
+  }
 }
 
 static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
   if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
-    if(accelerated_x) {
+    if (accelerated_x) {
       player_reduce_speed_x(self);
     }
     player_reduce_speed_x(self);
   }
 
   if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
-    if(accelerated_y) {
+    if (accelerated_y) {
       player_reduce_speed_y(self);
     }
     player_reduce_speed_y(self);

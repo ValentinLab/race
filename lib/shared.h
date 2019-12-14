@@ -46,6 +46,11 @@ int absol(int n);
 int sum_1_to_n(int n);
 
 /*
+ * Calculer la coordonnée d'arrivée si on freine maintenant avec une coordonnée et une vitesse données
+ */
+int coord_if_we_break_now(int pos, int speed);
+
+/*
  * ----------------------------------------
  * Struct player
  * ----------------------------------------
@@ -73,24 +78,14 @@ void player_update_pos(struct player *self);
 /*
  * Calculer la distance entre le joueur et l'objectif
  */
-int player_dist(struct player *self, struct target *target, bool is_abscissa);
+int player_dist(const  struct player *self, const struct target *target, bool is_abscissa);
 
-/*
- * Réduire la vitesse (axe x)
- */
+/* Réduire la vitesse sur un axe */
 void player_reduce_speed_x(struct player *self);
-
-/*
- * Réduire la vitesse (axe y)
- */
 void player_reduce_speed_y(struct player *self);
 
-/* Augmenter la vitesse (axe x) */
+/* Augmenter la vitesse sur un axe, en direction de la cible */
 void player_increase_speed_x(struct player *self, struct target *target);
-
-/*
- * Augmenter la vitesse (axe y)
- */
 void player_increase_speed_y(struct player *self, struct target *target);
 
 /*
@@ -100,6 +95,18 @@ void player_increase_speed_y(struct player *self, struct target *target);
  * Sinon, il garde la même vitesse.
  */
 void update_speed(struct player *self, struct target *target);
+
+/* Retourne vrai si on arrive sur le même axe que la cible en freinant maintenant */
+bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target);
+bool is_on_target_Y_if_brake_now(const struct player *self, const struct target *target);
+
+/* Retourne vrai si on dépasse la cible sur un axe en freinant maintenant */
+bool if_overshooting_target_X_if_brake_now(const struct player *self, const struct target *target);
+bool if_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target);
+
+/* Retourne vrai si le joueur va atteindre l'axe de la cible en maintenant sa vitesse actuelle */
+bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target);
+bool will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target);
 
 /*
  * ----------------------------------------
