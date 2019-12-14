@@ -1,9 +1,9 @@
 CFLAGS = -Wall -g -Iinclude -std=c99
-
 LIB_DIR = lib
 
 SHARED_OBJ = shared.o
 TARGETS = cugnot multipla trottinette
+SCRIPTS = stats-for-race comparison-race viewer-simple
 
 all: libshared.a $(TARGETS)
 
@@ -22,14 +22,21 @@ multipla: $(LIB_DIR)/multipla.o libshared.a
 trottinette: $(LIB_DIR)/trottinette.o libshared.a
 	cc -o $@ $(LIB_DIR)/trottinette.o -L. -lshared -lpthread
 
+scripts: 
+	shc -f scripts_sources/stats-for-race.sh -o stats-for-race
+	shc -f scripts_sources/comparison-race.sh -o comparison-race
+	shc -f scripts_sources/viewer-simple.sh -o viewer-simple
+
 clean:
 	rm -f $(LIB_DIR)/*.o
 	rm -f *.o
 	rm -f *.log*
+	rm -f scripts_sources/*.sh.x.c
 
 mrproper: clean
 	rm -f libshared.a
 	rm -f $(TARGETS)
+	rm -f $(SCRIPTS)
 
 ARCHIVE_DIR = nhoun_vperignon
 

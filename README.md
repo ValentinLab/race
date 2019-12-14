@@ -4,9 +4,8 @@ Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://githu
 
 ## Scripts
 Compilables avec `shc` disponible ici : [shc Github](https://github.com/neurobin/shc)
-```
-shc -f scripts_sources/stats-for-race.sh -o stats-for-race
-shc -f scripts_sources/viewer-simple.sh -o viewer-simple
+```bash
+make scripts
 ```
 
 ## Seeds pour tests
@@ -15,10 +14,8 @@ shc -f scripts_sources/viewer-simple.sh -o viewer-simple
 -  Seed sympa avec beaucoup de petites cibles `2709897513`
 
 - [x] Cugnot disqualifié : `1508001905`
-
 - [ ] Multipla explose Race-hi `2938387905`
 - [x] Race-hi explose multipla (points) : `577644688`
 - [ ] Race-hi explose multipla (trajectoire) : `1697104660`
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
-
 - [x] Trottinette disqualifié : `3050529712`

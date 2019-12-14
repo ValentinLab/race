@@ -1,8 +1,15 @@
 #!/bin/bash
+set -m
+
+color_default="\033[39m"
+color_blue="\033[34m"
+color_red="\033[31m"
+format_default="\033[0m"
+format_bold="\033[1m"
 
 if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
-        echo -e "\e[36mViewer-simple for Race \e[39m"
-        echo "Made by Nathanaël H."
+        echo -e "${color_blue}${format_bold}Viewer-simple for Race ${color_default}${format_default}"
+        echo "Made by Nathanaël H. & Valentin P."
         echo ""
         echo "  Usage :"
         echo "      viewer-simple [-s seed] <player1> [player2] [player3] [player4]"
@@ -14,7 +21,7 @@ if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
     fi
 
 if [ "$#" -lt 1 ] || [ "$#" -gt 6 ] ; then
-    echo -e "\e[91mviewer-simple : Illegal number of parameters.\e[39m Please try 'viewer-simple --help'"
+    echo -e "${color_red}viewer-simple : Illegal number of parameters.${color_default} Please try 'viewer-simple --help'"
     exit 0
 fi
 
