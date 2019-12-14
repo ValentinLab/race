@@ -103,7 +103,7 @@ void update_speed(struct player *self, struct target *target);
 
 /*
  * ----------------------------------------
- * Struct player
+ * Struct target
  * ----------------------------------------
  */
 

@@ -10,8 +10,9 @@
 !race-server
 !race-viewer
 !lib/
+!rapport/
 *.log
-
+*.xcf
 # ---------- General ----------
 
 # Executables
