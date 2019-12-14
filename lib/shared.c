@@ -187,6 +187,14 @@ bool will_player_touch_target_Y_with_current_speed(const struct player *self, co
   return (self->speed_y != 0 && (delta % self->speed_y) == 0);
 }
 
+bool will_player_touch_target_with_current_speed(const struct player *self, const struct target *target) {
+  int deltaX = player_dist(self, target, true); // deltaX
+  int deltaY = player_dist(self, target, false); // deltaY
+  int iteration_needed_X = self->speed_x == 0 ? 0 : deltaX / self->speed_x;
+  int iteration_needed_Y = self->speed_y == 0 ? 0 : deltaY / self->speed_y;
+  return (iteration_needed_X == iteration_needed_Y && will_player_touch_target_X_with_current_speed(self, target) && will_player_touch_target_Y_with_current_speed(self, target));
+}
+
 /*
  * ----------------------------------------
  * Struct target

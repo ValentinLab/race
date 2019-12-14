@@ -6,10 +6,23 @@
 #include <string.h>
 
 #define BUFSIZE 256
-#define IS_BETWEEN(x, alpha, omega) (((alpha) <= (x)) && ((x) <= (omega)))
 
 static void accelerate_toward_target(struct player *self, struct target *target, bool *accelerated_x, bool *accelerated_y) {
-  if (!will_player_touch_target_X_with_current_speed(self, target)) {
+  if (will_player_touch_target_with_current_speed(self, target)) {
+    *accelerated_x = false;
+    *accelerated_y = false;
+
+    player_increase_speed_x(self, target);
+    player_increase_speed_y(self, target);
+    if (will_player_touch_target_with_current_speed(self, target)) { // 'with increased speed' en fait
+      *accelerated_x = true;
+      *accelerated_y = true;
+    } else {
+      player_reduce_speed_x(self); // On retourne à la vitesse de base
+      player_reduce_speed_y(self); //
+    }
+  } else {
+
     if (is_on_target_X_if_brake_now(self, target)) {
       player_reduce_speed_x(self);
       *accelerated_x = false;
@@ -22,9 +35,7 @@ static void accelerate_toward_target(struct player *self, struct target *target,
         *accelerated_x = true;
       }
     }
-  }
 
-  if (!will_player_touch_target_Y_with_current_speed(self, target)) {
     if (is_on_target_Y_if_brake_now(self, target)) {
       player_reduce_speed_y(self);
       *accelerated_y = false;
