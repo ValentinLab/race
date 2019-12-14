@@ -24,6 +24,7 @@ trottinette: $(LIB_DIR)/trottinette.o libshared.a
 
 clean:
 	rm -f $(LIB_DIR)/*.o
+	rm -f *.o
 	rm -f *.log*
 
 mrproper: clean
