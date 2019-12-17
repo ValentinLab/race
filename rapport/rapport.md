@@ -11,6 +11,7 @@
  - **slow.c** : premier joueur réalisé, il se déplace avec une vitesse constante de |1|. *depreciated* car il n'utilise pas les structures;
  - **cugnot.c** : le joueur adapte sa vitesse en fonction de sa distance à l'objectif pour réduire le nombre de coups;
  - **multipla.c** : en plus d'augmenter sa vitesse, le joueur sélectionne parmi les cases de la cible celle qui possède le plus faible score sur les bords de la cible.
+ - **trottinette.c** : _En cours de développement_ Accélère autant tant qu'il touche la cible et ne sort pas du terrain. Ne choisit pas de meilleure case. 
 
 # Nos structures
 Les structures sont toutes accompagnées d'une fonction `structure_init()` qui instancie la structure avec les paramètres envoyés par le serveur.
