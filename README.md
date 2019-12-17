@@ -2,12 +2,6 @@
 Un joueur cherche à atteindre tous les objectifs répartis sur un terrain.
 Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://github.com/nathanaelhoun) et [**@ValentinLab**](https://github.com/ValentinLab).
 
-## Scripts
-Compilables avec `shc` disponible ici : [shc Github](https://github.com/neurobin/shc)
-```bash
-make scripts
-```
-
 ## Seeds pour tests
 *Utilisation avec `./race-server -s seed ./joueur`*
 
