@@ -6,6 +6,36 @@
 
 #define BUFSIZE 256
 
+/*
+ * Met à jour la vitesse du joueur
+ * S'il est trop proche de l'obj
+void update_speed(struct player *self, struct target *target);
+ectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est assez loin de l'objectif, il accélère
+ * Sinon, il garde la même vitesse.
+ */
+static void update_speed(struct player *self, struct target *target) {
+  int delta = player_dist(self, target, true); // deltaX
+  fprintf(stderr, "DeltaX : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_x(self);
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
+    player_reduce_speed_x(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
+    player_increase_speed_x(self, target);
+  }
+
+  delta = player_dist(self, target, false); // deltaY
+  fprintf(stderr, "DeltaY : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_y(self);
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
+    player_reduce_speed_y(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
+    player_increase_speed_y(self, target);
+  }
+}
+
 /**
  * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
  */

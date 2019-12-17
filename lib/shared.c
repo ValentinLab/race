@@ -97,10 +97,10 @@ void player_reduce_speed_x(struct player *self) {
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_x < 0) {
       self->speed_x += 1;
-      return;
+    } else {
+      // Si la vitesse est positive, on la décrémente
+      self->speed_x -= 1;
     }
-    // Si la vitesse est positive, on la décrémente
-    self->speed_x -= 1;
   }
 }
 
@@ -110,10 +110,10 @@ void player_reduce_speed_y(struct player *self) {
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_y < 0) {
       self->speed_y += 1;
-      return;
+    } else {
+      // Si la vitesse est positive, on la décrémente
+      self->speed_y -= 1;
     }
-    // Si la vitesse est positive, on la décrémente
-    self->speed_y -= 1;
   }
 }
 
@@ -128,7 +128,6 @@ void player_increase_speed_x(struct player *self, struct target *target) {
     // Si l'objet est à gauche, on incrémente
     if (target->x < self->pos_x) {
       self->speed_x -= 1;
-      return;
     } else {
       // Si l'objet est à droite on décrémente
       self->speed_x += 1;
@@ -152,28 +151,6 @@ void player_increase_speed_y(struct player *self, struct target *target) {
 void player_increase_speed(struct player *self, struct target *target) {
   player_increase_speed_x(self, target);
   player_increase_speed_y(self, target);
-}
-
-void update_speed(struct player *self, struct target *target) {
-  int delta = player_dist(self, target, true); // deltaX
-  fprintf(stderr, "DeltaX : %i\n", delta);
-  if (delta == 0) {
-    player_reduce_speed_x(self);
-  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
-    player_reduce_speed_x(self);
-  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
-    player_increase_speed_x(self, target);
-  }
-
-  delta = player_dist(self, target, false); // deltaY
-  fprintf(stderr, "DeltaY : %i\n", delta);
-  if (delta == 0) {
-    player_reduce_speed_y(self);
-  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
-    player_reduce_speed_y(self);
-  } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
-    player_increase_speed_y(self, target);
-  }
 }
 
 bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target) {

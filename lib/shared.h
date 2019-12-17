@@ -97,14 +97,6 @@ void player_increase_speed_x(struct player *self, struct target *target);
 void player_increase_speed_y(struct player *self, struct target *target);
 void player_increase_speed(struct player *self, struct target *target);
 
-/*
- * Met à jour la vitesse du joueur
- * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
- * S'il est assez loin de l'objectif, il accélère
- * Sinon, il garde la même vitesse.
- */
-void update_speed(struct player *self, struct target *target);
-
 /* Retourne vrai si on arrive sur le même axe que la cible en freinant maintenant */
 bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target);
 bool is_on_target_Y_if_brake_now(const struct player *self, const struct target *target);

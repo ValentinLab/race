@@ -6,6 +6,36 @@
 
 #define BUFSIZE 256
 
+/*
+ * Met à jour la vitesse du joueur
+ * S'il est trop proche de l'obj
+void update_speed(struct player *self, struct target *target);
+ectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est assez loin de l'objectif, il accélère
+ * Sinon, il garde la même vitesse.
+ */
+static void update_speed(struct player *self, struct target *target) {
+  int delta = player_dist(self, target, true); // deltaX
+  fprintf(stderr, "DeltaX : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_x(self);
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_x)) || (delta < 0 && -sum_1_to_n(self->speed_x) < delta)) {
+    player_reduce_speed_x(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_x + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_x - 1))) {
+    player_increase_speed_x(self, target);
+  }
+
+  delta = player_dist(self, target, false); // deltaY
+  fprintf(stderr, "DeltaY : %i\n", delta);
+  if (delta == 0) {
+    player_reduce_speed_y(self);
+  } else if ((delta > 0 && delta < sum_1_to_n(self->speed_y)) || (delta < 0 && -sum_1_to_n(self->speed_y) < delta)) {
+    player_reduce_speed_y(self);
+  } else if ((delta > 0 && sum_1_to_n(self->speed_y + 1) <= delta) || (delta < 0 && delta <= -sum_1_to_n(self->speed_y - 1))) {
+    player_increase_speed_y(self, target);
+  }
+}
+
 static void target_optimise_line(struct target *self, const int *ground, const size_t SIZE, const size_t iter_x_min, const size_t iter_x_max, const size_t iter_y_min, const size_t iter_y_max) {
   for (size_t y = iter_y_min; y <= iter_y_max; ++y) {
     for (size_t x = iter_x_min; x <= iter_x_max; ++x) {
@@ -212,9 +242,9 @@ int main() {
     // Récupérer la réponse du serveur
     fgets(buf, BUFSIZE, stdin);
     if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
-      free(grid);
-      return 0;
+      break;
     }
+
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
       get_and_optimize_obj(&real_target, &target, &multipla, buf, grid, SIZE);
       continue;
