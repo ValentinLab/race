@@ -161,12 +161,12 @@ bool is_on_target_Y_if_brake_now(const struct player *self, const struct target 
   return (target->y <= y_if_we_brake_now && y_if_we_brake_now <= target->ybottom);
 }
 
-bool if_overshooting_target_X_if_brake_now(const struct player *self, const struct target *target) {
+bool is_overshooting_target_X_if_brake_now(const struct player *self, const struct target *target) {
   int x_if_we_brake_now = coord_if_we_break_now(self->pos_x, self->speed_x);
   return ((self->pos_x < target->x && target->xright < x_if_we_brake_now) || (target->xright < self->pos_x && x_if_we_brake_now < target->x));
 }
 
-bool if_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target) {
+bool is_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target) {
   int y_if_we_brake_now = coord_if_we_break_now(self->pos_y, self->speed_y);
   return ((self->pos_y < target->y && target->ybottom < y_if_we_brake_now) || (target->ybottom < self->pos_y && y_if_we_brake_now < target->y));
 }

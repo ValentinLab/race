@@ -23,29 +23,39 @@ static void accelerate_toward_target(struct player *self, struct target *target,
     }
   } else {
 
-    if (is_on_target_X_if_brake_now(self, target)) {
+    if (is_overshooting_target_X_if_brake_now(self, target)) {
       player_reduce_speed_x(self);
       *accelerated_x = false;
     } else {
-      player_increase_speed_x(self, target);
-      if (if_overshooting_target_X_if_brake_now(self, target)) {
+      if (is_on_target_X_if_brake_now(self, target)) {
         player_reduce_speed_x(self);
         *accelerated_x = false;
       } else {
-        *accelerated_x = true;
+        player_increase_speed_x(self, target);
+        if (is_overshooting_target_X_if_brake_now(self, target)) {
+          player_reduce_speed_x(self);
+          *accelerated_x = false;
+        } else {
+          *accelerated_x = true;
+        }
       }
     }
 
-    if (is_on_target_Y_if_brake_now(self, target)) {
+    if (is_overshooting_target_Y_if_brake_now(self, target)) {
       player_reduce_speed_y(self);
       *accelerated_y = false;
     } else {
-      player_increase_speed_y(self, target);
-      if (if_overshooting_target_Y_if_brake_now(self, target)) {
+      if (is_on_target_Y_if_brake_now(self, target)) {
         player_reduce_speed_y(self);
         *accelerated_y = false;
       } else {
-        *accelerated_y = true;
+        player_increase_speed_y(self, target);
+        if (is_overshooting_target_Y_if_brake_now(self, target)) {
+          player_reduce_speed_y(self);
+          *accelerated_y = false;
+        } else {
+          *accelerated_y = true;
+        }
       }
     }
   }
