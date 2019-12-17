@@ -10,9 +10,9 @@ Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://githu
 - [x] Cugnot disqualifié : `1508001905`
 - [x] Multipla explose Race-hi `2938387905`
 - [x] Race-hi explose multipla (points) : `577644688`
-- [ ] Race-hi explose multipla (trajectoire) : `1697104660`
+- [ ] Race-hi dépasse multipla (trajectoire) : `1697104660`
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
-- [ ] Multipla disqualifié : `3785148849`
+- [ ] Multipla disqualifié (deux objectifs d'affilée au bon endroit) : `3785148849`
 - [x] Trottinette disqualifié : `3050529712`
 - [x] Trottinette disqualifiée : `1318867896`
 - [ ] Trottinette boucle infinie : `1983039468`
