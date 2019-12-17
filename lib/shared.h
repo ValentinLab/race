@@ -100,11 +100,12 @@ void update_speed(struct player *self, struct target *target);
 bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target);
 bool is_on_target_Y_if_brake_now(const struct player *self, const struct target *target);
 
-/* Retourne vrai si on dépasse la cible sur un axe en freinant maintenant */
+/* Retourne vrai si on dépasse la cible sur un axe (ou sur un des deux) en freinant maintenant */
 bool is_overshooting_target_X_if_brake_now(const struct player *self, const struct target *target);
 bool is_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target);
+bool is_overshooting_target_if_brake_now(const struct player *self, const struct target *target);
 
-/* Retourne vrai si le joueur va atteindre l'axe de la cible en maintenant sa vitesse actuelle */
+/* Retourne vrai si le joueur va atteindre l'axe de la cible (ou la cible elle-même) en maintenant sa vitesse actuelle */
 bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target);
 bool will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target);
 bool will_player_touch_target_with_current_speed(const struct player *self, const struct target *target);

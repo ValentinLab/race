@@ -171,6 +171,10 @@ bool is_overshooting_target_Y_if_brake_now(const struct player *self, const stru
   return ((self->pos_y < target->y && target->ybottom < y_if_we_brake_now) || (target->ybottom < self->pos_y && y_if_we_brake_now < target->y));
 }
 
+bool is_overshooting_target_if_brake_now(const struct player *self, const struct target *target) {
+  return is_overshooting_target_X_if_brake_now(self, target) || is_overshooting_target_Y_if_brake_now(self, target);
+}
+
 bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
   int delta = player_dist(self, target, true); // deltaX
   if ((self->speed_x < 0 && self->pos_x < target->x) || (self->speed_x > 0 && target->xright < self->pos_x)) {
@@ -188,7 +192,7 @@ bool will_player_touch_target_Y_with_current_speed(const struct player *self, co
 }
 
 bool will_player_touch_target_with_current_speed(const struct player *self, const struct target *target) {
-  int deltaX = player_dist(self, target, true); // deltaX
+  int deltaX = player_dist(self, target, true);  // deltaX
   int deltaY = player_dist(self, target, false); // deltaY
   int iteration_needed_X = self->speed_x == 0 ? 0 : deltaX / self->speed_x;
   int iteration_needed_Y = self->speed_y == 0 ? 0 : deltaY / self->speed_y;
