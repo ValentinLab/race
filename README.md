@@ -18,4 +18,5 @@ make scripts
 - [x] Race-hi explose multipla (points) : `577644688`
 - [ ] Race-hi explose multipla (trajectoire) : `1697104660`
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
+- [ ] Multipla disqualifié : `3785148849`
 - [x] Trottinette disqualifié : `3050529712`
