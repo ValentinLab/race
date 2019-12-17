@@ -20,3 +20,5 @@ make scripts
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
 - [ ] Multipla disqualifié : `3785148849`
 - [x] Trottinette disqualifié : `3050529712`
+- [x] Trottinette disqualifiée : `1318867896`
+- [ ] Trottinette boucle infinie : `1983039468`
