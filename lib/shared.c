@@ -59,6 +59,8 @@ void player_init(struct player *self, char *buf) {
 
   self->speed_x = 0;
   self->speed_y = 0;
+  self->has_accelerated_x = 0;
+  self->has_accelerated_y = 0;
 }
 
 void player_dump(const struct player *self) {
@@ -76,6 +78,8 @@ void player_copy(struct player *self, struct player *copy) {
 void player_update_pos(struct player *self) {
   self->pos_x += self->speed_x;
   self->pos_y += self->speed_y;
+  self->has_accelerated_x = 0;
+  self->has_accelerated_y = 0;
 }
 
 int player_dist(const struct player *self, const struct target *target, bool is_abscissa) {
@@ -87,6 +91,7 @@ int player_dist(const struct player *self, const struct target *target, bool is_
 
 void player_reduce_speed_x(struct player *self) {
   if (self->speed_x != 0) {
+    self->has_accelerated_x -= 1;
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_x < 0) {
       self->speed_x += 1;
@@ -98,6 +103,7 @@ void player_reduce_speed_x(struct player *self) {
 }
 
 void player_reduce_speed_y(struct player *self) {
+  self->has_accelerated_y -= 1;
   if (self->speed_y != 0) {
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_y < 0) {
@@ -109,7 +115,13 @@ void player_reduce_speed_y(struct player *self) {
   }
 }
 
+void player_reduce_speed(struct player *self) {
+  player_reduce_speed_x(self);
+  player_reduce_speed_y(self);
+}
+
 void player_increase_speed_x(struct player *self, struct target *target) {
+  self->has_accelerated_x += 1;
   // Si l'objet est à gauche, on incrémente
   if (target->x < self->pos_x) {
     self->speed_x -= 1;
@@ -120,6 +132,7 @@ void player_increase_speed_x(struct player *self, struct target *target) {
 }
 
 void player_increase_speed_y(struct player *self, struct target *target) {
+  self->has_accelerated_y += 1;
   // Si l'objet est à gauche, on incrémente
   if (target->y < self->pos_y) {
     self->speed_y -= 1;
@@ -128,6 +141,12 @@ void player_increase_speed_y(struct player *self, struct target *target) {
   // Si l'objet est à droite on décrémente
   self->speed_y += 1;
 }
+
+void player_increase_speed(struct player *self, struct target *target) {
+  player_increase_speed_x(self, target);
+  player_increase_speed_y(self, target);
+}
+
 
 void update_speed(struct player *self, struct target *target) {
   int delta = player_dist(self, target, true); // deltaX
@@ -175,28 +194,49 @@ bool is_overshooting_target_if_brake_now(const struct player *self, const struct
   return is_overshooting_target_X_if_brake_now(self, target) || is_overshooting_target_Y_if_brake_now(self, target);
 }
 
-bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
-  int delta = player_dist(self, target, true); // deltaX
+int will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
+  if(target_is_player_on(target, self)) {return 0; }
+  
+  if (self->speed_x == 0) { return -1; } // Vitesse nulle et on est pas sur la cible
+  
   if ((self->speed_x < 0 && self->pos_x < target->x) || (self->speed_x > 0 && target->xright < self->pos_x)) {
-    return false;
+    return -1; // On va pas dans la bonne direction
   }
-  return (self->speed_x != 0 && (delta % self->speed_x) == 0);
+
+  int delta = player_dist(self, target, true); // deltaX
+  if (delta % self->speed_x == 0) {
+    return delta / absol(self->speed_x);
+  }
+
+  return -1;
 }
 
-bool will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target) {
-  int delta = player_dist(self, target, false); // deltaY
+int will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target) {
+  if(target_is_player_on(target, self)) {return 0; }
+  
+  if (self->speed_y == 0) { return -1; } // Vitesse nulle et on est pas sur la cible
+  
   if ((self->speed_y < 0 && self->pos_y < target->y) || (self->speed_y > 0 && target->ybottom < self->pos_y)) {
-    return false;
+    return -1; // On va pas dans la bonne direction
   }
-  return (self->speed_y != 0 && (delta % self->speed_y) == 0);
+
+  int delta = player_dist(self, target, true); // deltaY
+  if (delta % self->speed_y == 0) {
+    return delta / absol(self->speed_y);
+  }
+
+  return -1;
 }
 
-bool will_player_touch_target_with_current_speed(const struct player *self, const struct target *target) {
-  int deltaX = player_dist(self, target, true);  // deltaX
-  int deltaY = player_dist(self, target, false); // deltaY
-  int iteration_needed_X = self->speed_x == 0 ? 0 : deltaX / self->speed_x;
-  int iteration_needed_Y = self->speed_y == 0 ? 0 : deltaY / self->speed_y;
-  return (iteration_needed_X == iteration_needed_Y && will_player_touch_target_X_with_current_speed(self, target) && will_player_touch_target_Y_with_current_speed(self, target));
+
+int will_player_touch_target_with_current_speed(const struct player *self, const struct target *target) {
+  int iteration_needed_X = will_player_touch_target_X_with_current_speed(self, target);
+  int iteration_needed_Y = will_player_touch_target_Y_with_current_speed(self, target);
+  if (iteration_needed_X == iteration_needed_Y) {
+    return iteration_needed_X;
+  }
+  
+  return -1;
 }
 
 /*

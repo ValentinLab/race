@@ -7,11 +7,18 @@
 #define BUFSIZE 256
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
+/**
+ * pos_x, pos_y : position sur la grille
+ * speed_x, speed_y : vitesse actuelle
+ * has_accelerated_x, has_accelerated_y : <0 s'il a ralenti, 0 si il n'a pas modifié sa vitesse, +1 s'il a accéléré
+ */
 struct player {
   int pos_x;
   int pos_y;
   int speed_x;
   int speed_y;
+  int has_accelerated_x;
+  int has_accelerated_y;
 };
 
 struct target {
@@ -80,13 +87,15 @@ void player_update_pos(struct player *self);
  */
 int player_dist(const  struct player *self, const struct target *target, bool is_abscissa);
 
-/* Réduire la vitesse sur un axe */
+/* Réduire la vitesse sur un axe (ou sur les deux) */
 void player_reduce_speed_x(struct player *self);
 void player_reduce_speed_y(struct player *self);
+void player_reduce_speed(struct player *self);
 
-/* Augmenter la vitesse sur un axe, en direction de la cible */
+/* Augmenter la vitesse sur un axe (ou sur les deux), en direction de la cible */
 void player_increase_speed_x(struct player *self, struct target *target);
 void player_increase_speed_y(struct player *self, struct target *target);
+void player_increase_speed(struct player *self, struct target *target);
 
 /*
  * Met à jour la vitesse du joueur
@@ -105,10 +114,12 @@ bool is_overshooting_target_X_if_brake_now(const struct player *self, const stru
 bool is_overshooting_target_Y_if_brake_now(const struct player *self, const struct target *target);
 bool is_overshooting_target_if_brake_now(const struct player *self, const struct target *target);
 
-/* Retourne vrai si le joueur va atteindre l'axe de la cible (ou la cible elle-même) en maintenant sa vitesse actuelle */
-bool will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target);
-bool will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target);
-bool will_player_touch_target_with_current_speed(const struct player *self, const struct target *target);
+/* Retourne le nombre d'itération pour la toucher si le joueur va atteindre l'axe de la cible (ou la cible elle-même) en maintenant sa vitesse actuelle
+ * -1 s'il ne touchera pas la cible
+ */
+int will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target);
+int will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target);
+int will_player_touch_target_with_current_speed(const struct player *self, const struct target *target);
 
 /*
  * ----------------------------------------
