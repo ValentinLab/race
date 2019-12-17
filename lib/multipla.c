@@ -8,9 +8,7 @@
 
 /*
  * Met à jour la vitesse du joueur
- * S'il est trop proche de l'obj
-void update_speed(struct player *self, struct target *target);
-ectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
  * S'il est assez loin de l'objectif, il accélère
  * Sinon, il garde la même vitesse.
  */
@@ -86,6 +84,7 @@ static void target_right(struct target *self, const struct target *initial_targe
 /**
  * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
  * Retourne 1 si on utilise target temp
+ * Voir la description de l'algorithme dans le README.
  */
 static int target_optimise(struct target *self, struct target *temp, const int *ground, const size_t SIZE, const struct player *player) {
   self->value = 0x7FFFFFFF;

@@ -8,9 +8,7 @@
 
 /*
  * Met à jour la vitesse du joueur
- * S'il est trop proche de l'obj
-void update_speed(struct player *self, struct target *target);
-ectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
  * S'il est assez loin de l'objectif, il accélère
  * Sinon, il garde la même vitesse.
  */
