@@ -17,6 +17,14 @@
 *.log
 *.xcf
 *.tar.gz
+
+
+# ---------- General ----------
+
+viewer-simple
+comparison-race
+stats-for-race
+
 # ---------- General ----------
 
 # Executables
