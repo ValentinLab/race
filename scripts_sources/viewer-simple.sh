@@ -27,6 +27,6 @@ fi
 
 args=$1" "$2" "$3" "$4" "$5" "$6
 
-./race-viewer & (sleep 1 && ./race-server $args) && fg
+./race-viewer-v2 & (sleep 1 && ./race-server $args) && fg
 
 exit 0
