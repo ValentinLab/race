@@ -90,7 +90,7 @@ int player_dist(const struct player *self, const struct target *target, bool is_
 }
 
 void player_reduce_speed_x(struct player *self) {
-  if (self->speed_x != 0) {
+  if (self->has_accelerated_y >= 0 && self->speed_x != 0) {
     self->has_accelerated_x -= 1;
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_x < 0) {
@@ -103,8 +103,8 @@ void player_reduce_speed_x(struct player *self) {
 }
 
 void player_reduce_speed_y(struct player *self) {
-  self->has_accelerated_y -= 1;
-  if (self->speed_y != 0) {
+  if (self->has_accelerated_y >= 0 && self->speed_y != 0) {
+    self->has_accelerated_y -= 1;
     // Si la vitesse est négative, on l'incrémente
     if (self->speed_y < 0) {
       self->speed_y += 1;
@@ -121,32 +121,36 @@ void player_reduce_speed(struct player *self) {
 }
 
 void player_increase_speed_x(struct player *self, struct target *target) {
-  self->has_accelerated_x += 1;
-  // Si l'objet est à gauche, on incrémente
-  if (target->x < self->pos_x) {
-    self->speed_x -= 1;
-    return;
+  if (self->has_accelerated_x <= 0) {
+    self->has_accelerated_x += 1;
+    // Si l'objet est à gauche, on incrémente
+    if (target->x < self->pos_x) {
+      self->speed_x -= 1;
+      return;
+    } else {
+      // Si l'objet est à droite on décrémente
+      self->speed_x += 1;
+    }
   }
-  // Si l'objet est à droite on décrémente
-  self->speed_x += 1;
 }
 
 void player_increase_speed_y(struct player *self, struct target *target) {
-  self->has_accelerated_y += 1;
-  // Si l'objet est à gauche, on incrémente
-  if (target->y < self->pos_y) {
-    self->speed_y -= 1;
-    return;
+  if (self->has_accelerated_y <= 0) {
+    self->has_accelerated_y += 1;
+    // Si l'objet est à gauche, on incrémente
+    if (target->y < self->pos_y) {
+      self->speed_y -= 1;
+    } else {
+      // Si l'objet est à droite on décrémente
+      self->speed_y += 1;
+    }
   }
-  // Si l'objet est à droite on décrémente
-  self->speed_y += 1;
 }
 
 void player_increase_speed(struct player *self, struct target *target) {
   player_increase_speed_x(self, target);
   player_increase_speed_y(self, target);
 }
-
 
 void update_speed(struct player *self, struct target *target) {
   int delta = player_dist(self, target, true); // deltaX
@@ -195,10 +199,14 @@ bool is_overshooting_target_if_brake_now(const struct player *self, const struct
 }
 
 int will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
-  if(target_is_player_on(target, self)) {return 0; }
-  
-  if (self->speed_x == 0) { return -1; } // Vitesse nulle et on est pas sur la cible
-  
+  if (target_is_player_on(target, self)) {
+    return 0;
+  }
+
+  if (self->speed_x == 0) {
+    return -1;
+  } // Vitesse nulle et on est pas sur la cible
+
   if ((self->speed_x < 0 && self->pos_x < target->x) || (self->speed_x > 0 && target->xright < self->pos_x)) {
     return -1; // On va pas dans la bonne direction
   }
@@ -212,10 +220,14 @@ int will_player_touch_target_X_with_current_speed(const struct player *self, con
 }
 
 int will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target) {
-  if(target_is_player_on(target, self)) {return 0; }
-  
-  if (self->speed_y == 0) { return -1; } // Vitesse nulle et on est pas sur la cible
-  
+  if (target_is_player_on(target, self)) {
+    return 0;
+  }
+
+  if (self->speed_y == 0) {
+    return -1;
+  } // Vitesse nulle et on est pas sur la cible
+
   if ((self->speed_y < 0 && self->pos_y < target->y) || (self->speed_y > 0 && target->ybottom < self->pos_y)) {
     return -1; // On va pas dans la bonne direction
   }
@@ -228,14 +240,13 @@ int will_player_touch_target_Y_with_current_speed(const struct player *self, con
   return -1;
 }
 
-
 int will_player_touch_target_with_current_speed(const struct player *self, const struct target *target) {
   int iteration_needed_X = will_player_touch_target_X_with_current_speed(self, target);
   int iteration_needed_Y = will_player_touch_target_Y_with_current_speed(self, target);
   if (iteration_needed_X == iteration_needed_Y) {
     return iteration_needed_X;
   }
-  
+
   return -1;
 }
 
