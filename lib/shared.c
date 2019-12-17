@@ -73,6 +73,8 @@ void player_copy(struct player *self, struct player *copy) {
   copy->pos_y = self->pos_y;
   copy->speed_x = self->speed_x;
   copy->speed_y = self->speed_y;
+  copy->has_accelerated_x = self->has_accelerated_x;
+  copy->has_accelerated_y = self->has_accelerated_y;
 }
 
 void player_update_pos(struct player *self) {

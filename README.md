@@ -14,7 +14,7 @@ make scripts
 -  Seed sympa avec beaucoup de petites cibles `2709897513`
 
 - [x] Cugnot disqualifié : `1508001905`
-- [ ] Multipla explose Race-hi `2938387905`
+- [x] Multipla explose Race-hi `2938387905`
 - [x] Race-hi explose multipla (points) : `577644688`
 - [ ] Race-hi explose multipla (trajectoire) : `1697104660`
 - [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`

@@ -87,6 +87,7 @@ int main() {
     // Récupérer la réponse du serveur
     fgets(buf, BUFSIZE, stdin);
     if (strcmp(buf, "ERROR\n") == 0 || strcmp(buf, "FINISH\n") == 0) {
+      free(grid);
       return 0;
     }
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
