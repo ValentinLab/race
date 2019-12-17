@@ -7,72 +7,42 @@
 
 #define BUFSIZE 256
 
-static void accelerate_toward_target(struct player *self, struct target *target, bool *accelerated_x, bool *accelerated_y) {
-  if (will_player_touch_target_with_current_speed(self, target)) {
-    *accelerated_x = false;
-    *accelerated_y = false;
-
-    player_increase_speed_x(self, target);
-    player_increase_speed_y(self, target);
-    if (will_player_touch_target_with_current_speed(self, target)) { // 'with increased speed' en fait
-      *accelerated_x = true;
-      *accelerated_y = true;
-    } else {
-      player_reduce_speed_x(self); // On retourne à la vitesse de base
-      player_reduce_speed_y(self); //
+static void accelerate_toward_target(struct player *self, struct target *target) {
+  if (0 <= will_player_touch_target_with_current_speed(self, target)) {
+    player_increase_speed(self, target);
+    if (-1 == will_player_touch_target_with_current_speed(self, target)) { // 'with increased speed' en fait
+      player_reduce_speed(self);
     }
   } else {
 
-    if (is_overshooting_target_X_if_brake_now(self, target)) {
+    if (is_overshooting_target_X_if_brake_now(self, target) || is_on_target_X_if_brake_now(self, target)) {
       player_reduce_speed_x(self);
-      *accelerated_x = false;
     } else {
-      if (is_on_target_X_if_brake_now(self, target)) {
+      player_increase_speed_x(self, target);
+      if (is_overshooting_target_X_if_brake_now(self, target)) {
         player_reduce_speed_x(self);
-        *accelerated_x = false;
-      } else {
-        player_increase_speed_x(self, target);
-        if (is_overshooting_target_X_if_brake_now(self, target)) {
-          player_reduce_speed_x(self);
-          *accelerated_x = false;
-        } else {
-          *accelerated_x = true;
-        }
       }
     }
 
-    if (is_overshooting_target_Y_if_brake_now(self, target)) {
+    if (is_overshooting_target_Y_if_brake_now(self, target) || is_on_target_Y_if_brake_now(self, target)) {
       player_reduce_speed_y(self);
-      *accelerated_y = false;
     } else {
-      if (is_on_target_Y_if_brake_now(self, target)) {
+      player_increase_speed_y(self, target);
+      if (is_overshooting_target_Y_if_brake_now(self, target)) {
         player_reduce_speed_y(self);
-        *accelerated_y = false;
-      } else {
-        player_increase_speed_y(self, target);
-        if (is_overshooting_target_Y_if_brake_now(self, target)) {
-          player_reduce_speed_y(self);
-          *accelerated_y = false;
-        } else {
-          *accelerated_y = true;
-        }
       }
     }
   }
 }
 
-static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE, bool accelerated_x, bool accelerated_y) {
+static void slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE) {
   if ((self->speed_x < 0 && self->pos_x < 1 + sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
-    if (accelerated_x) {
-      player_reduce_speed_x(self);
-    }
+    player_reduce_speed_x(self); // la sous-fonction vérifie que l'on ne ralentit pas 2 fois
     player_reduce_speed_x(self);
   }
 
   if ((self->speed_y < 0 && self->pos_y < 1 + sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
-    if (accelerated_y) {
-      player_reduce_speed_y(self);
-    }
+    player_reduce_speed_y(self); // la sous-fonction vérifie que l'on ne ralentit pas 2 fois
     player_reduce_speed_y(self);
   }
 }
@@ -99,8 +69,6 @@ int main() {
 
   // Récupérer la position initiale du joueur
   player_init(&trottinette, buf);
-  bool accelerated_x = false;
-  bool accelerated_y = false;
 
   // Récupérer les informations sur l'objectif
   target_init(&target, buf);
@@ -109,8 +77,8 @@ int main() {
   for (size_t round = 1;; ++round) {
     fprintf(stderr, "---[ Round #%zu\n", round);
 
-    accelerate_toward_target(&trottinette, &target, &accelerated_x, &accelerated_y);
-    slow_down_to_avoid_borders(&trottinette, SIZE, accelerated_x, accelerated_y);
+    accelerate_toward_target(&trottinette, &target);
+    slow_down_to_avoid_borders(&trottinette, SIZE);
     player_update_pos(&trottinette);
 
     // Envoyer les positions au serveur
