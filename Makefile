@@ -21,11 +21,18 @@ multipla: $(LIB_DIR)/multipla.o libshared.a
 trottinette: $(LIB_DIR)/trottinette.o libshared.a
 	cc -o $@ $(LIB_DIR)/trottinette.o -L. -lshared -lpthread
 
+sanitized:
+	cc -c $(LIB_DIR)/shared.c -fsanitize=address,undefined -o $(LIB_DIR)/shared.o
+	ar -cvq cr libshared.a $(LIB_DIR)/shared.o
+	cc -o trottinette $(LIB_DIR)/trottinette.o -L. -lshared -lpthread -fsanitize=address,undefined
+	cc -o multipla $(LIB_DIR)/multipla.o -L. -lshared -lpthread -fsanitize=address,undefined
+	cc -o cugnot $(LIB_DIR)/cugnot.o -L. -lshared -lpthread -fsanitize=address,undefined
+
+
 clean:
 	rm -f $(LIB_DIR)/*.o
 	rm -f *.o
 	rm -f *.log*
-	rm -f scripts_sources/*.sh.x.c
 
 mrproper: clean
 	rm -f libshared.a
