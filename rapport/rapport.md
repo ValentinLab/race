@@ -7,8 +7,9 @@ Exécuter à la racine du projet la commande :
 ```bash
 make
 ```
+Joueur à selectionner pour l'instant : `multipla`
 
-# Liste des joueurs réalisé
+# Liste des joueurs réalisés
  - **slow.c** : premier joueur réalisé, il se déplace avec une vitesse constante de |1|. Équivalent à *race-dumb*.
  - **cugnot.c** : le joueur adapte sa vitesse en fonction de sa distance à l'objectif pour réduire le nombre de coups.
  - **multipla.c** : en plus d'augmenter sa vitesse, le joueur sélectionne parmi les cases de la cible celle qui possède le plus faible score sur les bords de la cible.
