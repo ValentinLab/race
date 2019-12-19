@@ -39,8 +39,8 @@ static void update_speed(struct player *self, struct target *target) {
  */
 static void target_optimise(struct target *self, const int *ground, const size_t SIZE) {
   int actual_target_value = ground[self->y * SIZE + self->x];
-  size_t max_obj_x = self->x + self->w;
-  size_t max_obj_y = self->y + self->h;  
+  size_t max_obj_x = self->xright + 1;
+  size_t max_obj_y = self->ybottom + 1;  
 
   for (size_t y = self->y; y < max_obj_y; ++y) {
 

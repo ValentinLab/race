@@ -8,7 +8,9 @@
 
 /*
  * Met à jour la vitesse du joueur
- * S'il est trop proche de l'objectif par rapport à sa vitesse (delta < v + v-1 + ... + 1), il ralentit
+ * S'il est trop proche de l'objectif par rapport à sa vitesse 
+ * (delta < v + v-1 + ... + 1 <=> distance_vers_objectif <= distance_de_freinage), 
+ * alors il ralentit.
  * S'il est assez loin de l'objectif, il accélère
  * Sinon, il garde la même vitesse.
  */
@@ -34,6 +36,9 @@ static void update_speed(struct player *self, struct target *target) {
   }
 }
 
+/**
+ * Modifie *self avec la valeur la plus faible disponible sur une ligne de la grille
+ */
 static void target_optimise_line(struct target *self, const int *ground, const size_t SIZE, const size_t iter_x_min, const size_t iter_x_max, const size_t iter_y_min, const size_t iter_y_max) {
   for (size_t y = iter_y_min; y <= iter_y_max; ++y) {
     for (size_t x = iter_x_min; x <= iter_x_max; ++x) {
@@ -45,44 +50,56 @@ static void target_optimise_line(struct target *self, const int *ground, const s
     }
   }
 
-  self->w = 1;
-  self->h = 1;
+  self->xright = self->x; // Taille 1x1 pour la cible
+  self->ybottom = self->y;
 }
 
-static void target_top(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
+/**
+ * Modifie *self avec la meilleure case de la ligne du haut de la cible
+ */
+static void target_optimise_top(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
   size_t iter_x_min = initial_target->x;
-  size_t iter_x_max = initial_target->x + initial_target->w - 1;
+  size_t iter_x_max = initial_target->xright;
   size_t iter_y_min = initial_target->y;
   size_t iter_y_max = initial_target->y;
   target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
 }
 
-static void target_bottom(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
+/**
+ * Modifie *self avec la meilleure case de la ligne du bas de la cible
+ */
+static void target_optimise_bottom(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
   size_t iter_x_min = initial_target->x;
-  size_t iter_x_max = initial_target->x + initial_target->w - 1;
-  size_t iter_y_min = initial_target->y + initial_target->h - 1;
-  size_t iter_y_max = initial_target->y + initial_target->h - 1;
-  target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
-}
-
-static void target_left(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
-  size_t iter_x_min = initial_target->x;
-  size_t iter_x_max = initial_target->x;
-  size_t iter_y_min = initial_target->y;
-  size_t iter_y_max = initial_target->y + initial_target->h - 1;
-  target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
-}
-
-static void target_right(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
-  size_t iter_x_min = initial_target->x + initial_target->w - 1;
-  size_t iter_x_max = initial_target->x + initial_target->w - 1;
-  size_t iter_y_min = initial_target->y;
-  size_t iter_y_max = initial_target->y + initial_target->h - 1;
+  size_t iter_x_max = initial_target->xright;
+  size_t iter_y_min = initial_target->ybottom;
+  size_t iter_y_max = initial_target->ybottom;
   target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
 }
 
 /**
- * Modifie la case cible vers la case à la valeur la plus petite dans la cible 
+ * Modifie *self avec la meilleure case de la ligne de gauche de la cible
+ */
+static void target_optimise_left(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
+  size_t iter_x_min = initial_target->x;
+  size_t iter_x_max = initial_target->x;
+  size_t iter_y_min = initial_target->y;
+  size_t iter_y_max = initial_target->ybottom;
+  target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
+}
+
+/**
+ * Modifie *self avec la meilleure case de la ligne de droite de la cible
+ */
+static void target_optimise_right(struct target *self, const struct target *initial_target, const int *ground, const size_t SIZE, const struct player *player) {
+  size_t iter_x_min = initial_target->xright;
+  size_t iter_x_max = initial_target->xright;
+  size_t iter_y_min = initial_target->y;
+  size_t iter_y_max = initial_target->ybottom;
+  target_optimise_line(self, ground, SIZE, iter_x_min, iter_x_max, iter_y_min, iter_y_max);
+}
+
+/**
+ * Modifie la case cible vers la case à la valeur la plus petite dans la cible, parmi les cases qui sont sur les bords 
  * Retourne 1 si on utilise target temp
  * Voir la description de l'algorithme dans le README.
  */
@@ -91,86 +108,82 @@ static int target_optimise(struct target *self, struct target *temp, const int *
   struct target initial_target;
   target_copy(self, &initial_target);
 
-  size_t max_obj_x = self->x + self->w - 1;
-  size_t max_obj_y = self->y + self->h - 1;
-
-  if (self->x <= player->pos_x && player->pos_x <= max_obj_x && player->pos_y < self->y) { // Partie supérieure
-    target_top(self, &initial_target, ground, SIZE, player);
+  if (self->x <= player->pos_x && player->pos_x <= self->xright && player->pos_y < self->y) { // Partie supérieure
+    target_optimise_top(self, &initial_target, ground, SIZE, player);
     return 0;
   }
 
-  if (self->x <= player->pos_x && player->pos_x <= max_obj_x && max_obj_y < player->pos_y) { // Partie inférieure
-    target_bottom(self, &initial_target, ground, SIZE, player);
+  if (self->x <= player->pos_x && player->pos_x <= self->xright && self->ybottom < player->pos_y) { // Partie inférieure
+    target_optimise_bottom(self, &initial_target, ground, SIZE, player);
     return 0;
   }
 
-  if (self->y <= player->pos_y && player->pos_y <= max_obj_y && player->pos_x < self->x) { // Partie gauche
-    target_left(self, &initial_target, ground, SIZE, player);
+  if (self->y <= player->pos_y && player->pos_y <= self->ybottom && player->pos_x < self->x) { // Partie gauche
+    target_optimise_left(self, &initial_target, ground, SIZE, player);
     return 0;
   }
 
-  if (self->y <= player->pos_y && player->pos_y <= max_obj_y && max_obj_x < player->pos_x) { // Partie droite
-    target_right(self, &initial_target, ground, SIZE, player);
+  if (self->y <= player->pos_y && player->pos_y <= self->ybottom && self->xright < player->pos_x) { // Partie droite
+    target_optimise_right(self, &initial_target, ground, SIZE, player);
     return 0;
   }
 
   // Cas diagonales
-  if (player->pos_y < self->y) { // Supérieure
-    target_top(self, &initial_target, ground, SIZE, player);
+  if (player->pos_y < self->y) { // Diagonale supérieure
+    target_optimise_top(self, &initial_target, ground, SIZE, player);
 
     if (player->pos_x < self->x) { // Supérieure gauche
-      target_left(self, &initial_target, ground, SIZE, player);
+      target_optimise_left(self, &initial_target, ground, SIZE, player);
       target_copy(self, temp);
       --temp->x;
       --temp->y;
+      temp->xright = temp->x;
+      temp->ybottom = temp->y;
       return 1;
     }
 
     // Supérieure droite
-    target_right(self, &initial_target, ground, SIZE, player);
+    target_optimise_right(self, &initial_target, ground, SIZE, player);
     target_copy(self, temp);
     ++temp->x;
     --temp->y;
+    temp->xright = temp->x;
+    temp->ybottom = temp->y;
     return 1;
   }
 
-  // Inférieure
-  target_bottom(self, &initial_target, ground, SIZE, player);
+  // Diagonale inférieure
+  target_optimise_bottom(self, &initial_target, ground, SIZE, player);
   if (player->pos_x < self->x) { // Inférieure gauche
-    target_left(self, &initial_target, ground, SIZE, player);
+    target_optimise_left(self, &initial_target, ground, SIZE, player);
     target_copy(self, temp);
     --temp->x;
     ++temp->y;
+    temp->xright = temp->x;
+    temp->ybottom = temp->y;
     return 1;
   }
 
   // Inférieure droite
-  target_right(self, &initial_target, ground, SIZE, player);
+  target_optimise_right(self, &initial_target, ground, SIZE, player);
   target_copy(self, temp);
   ++temp->x;
   ++temp->y;
+  temp->xright = temp->x;
+  temp->ybottom = temp->y;
   return 1;
 }
 
 static void get_and_optimize_obj(struct target *real_target, struct target *target, struct player *player, char *buf, const int *grid, const int SIZE) {
 
   struct target initial_target;
-  initial_target.x = 0;
-  initial_target.y = 0;
-  initial_target.w = 0;
-  initial_target.h = 0;
-  initial_target.value = 0;
   target_init(&initial_target, buf);
-  fprintf(stderr, "Objectif non optimisé : ");
-  target_dump(&initial_target);
-
   target_copy(&initial_target, real_target);
+
   int status = target_optimise(real_target, target, grid, SIZE, player);
   if (status == 0) {
     // Pas besoin de cible temporaire
     target_copy(real_target, target);
-    fprintf(stderr, "Nouvel objectif optimisé : ");
-    target_dump(real_target);
     return;
   }
 
@@ -179,28 +192,22 @@ static void get_and_optimize_obj(struct target *real_target, struct target *targ
   struct player pl_copy;
 
   player_copy(player, &pl_copy);
-  while (!target_is_player_on(&initial_target, &pl_copy)) {
+  while (!player_is_on_target(&pl_copy, &initial_target)) {
     update_speed(&pl_copy, real_target);
     player_update_pos(&pl_copy);
   }
 
-  if (target_is_player_on(real_target, &pl_copy)) { // Si on arrive sur la vraie cible : on a pas besoin de cible temporaire
+  if (player_is_on_target(&pl_copy, real_target)) { // Si on arrive sur la vraie cible : on a pas besoin de cible temporaire
     target_copy(real_target, target);
-    fprintf(stderr, "Nouvel objectif optimisé (pas besoin de temp) : ");
-    target_dump(target);
-  } else { // On est du mauvais côté, on garde la cible temporaire
-    fprintf(stderr, "Nouvel objectif (temporaire) optimisé : ");
-    target_dump(target);
-    fprintf(stderr, "Nouvel objectif optimisé : ");
-    target_dump(real_target);
   }
+  // Sinon, on est du mauvais côté -> on garde la cible temporaire
 }
 
 int main() {
   // Structures
-  struct player multipla;
+  struct player tesla;
   struct target real_target;
-  struct target target;
+  struct target curr_target;
 
   // Création du buffer
   setbuf(stdout, NULL);
@@ -217,26 +224,29 @@ int main() {
     grid[i] = atoi(buf);
   }
 
-  print_grid(grid, SIZE);
-  fprintf(stderr, "\n");
-
   // Récupérer la position initiale du joueur
-  player_init(&multipla, buf);
+  player_init(&tesla, buf);
 
-  // Récupérer les informations sur l'objectif
-  get_and_optimize_obj(&real_target, &target, &multipla, buf, grid, SIZE);
+  // Récupérer les informations sur le premier objectif
+  get_and_optimize_obj(&real_target, &curr_target, &tesla, buf, grid, SIZE);
 
   for (size_t round = 1;; ++round) {
     fprintf(stderr, "---[ Round #%zu\n", round);
 
-    update_speed(&multipla, &target);
-    player_update_pos(&multipla);
-    if (target_is_player_on(&target, &multipla)) {
-      target_copy(&real_target, &target);
+    fprintf(stderr, "Cible actuelle : ");
+    target_dump(&curr_target);
+    fprintf(stderr, "\n");
+
+    update_speed(&tesla, &curr_target);
+    player_slow_down_to_avoid_borders(&tesla, SIZE);
+    player_update_pos(&tesla);
+    if (player_is_on_target(&tesla, &curr_target)) {
+      // Si on est arrivé sur la cible temporaire, alors on vise maintenant la vraie cible
+      target_copy(&real_target, &curr_target);
     }
 
     // Envoyer les positions au serveur
-    printf("%i\n%i\n", multipla.pos_x, multipla.pos_y);
+    printf("%i\n%i\n", tesla.pos_x, tesla.pos_y);
 
     // Récupérer la réponse du serveur
     fgets(buf, BUFSIZE, stdin);
@@ -245,7 +255,7 @@ int main() {
     }
 
     if (strcmp(buf, "CHECKPOINT\n") == 0) {
-      get_and_optimize_obj(&real_target, &target, &multipla, buf, grid, SIZE);
+      get_and_optimize_obj(&real_target, &curr_target, &tesla, buf, grid, SIZE);
       continue;
     }
   }

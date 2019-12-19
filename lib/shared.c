@@ -153,6 +153,10 @@ void player_increase_speed(struct player *self, struct target *target) {
   player_increase_speed_y(self, target);
 }
 
+bool player_is_on_target(const struct player *self, const struct target *target) {
+  return (target->x <= self->pos_x && self->pos_x <= target->xright && target->y <= self->pos_y && self->pos_y <= target->ybottom);
+}
+
 bool is_on_target_X_if_brake_now(const struct player *self, const struct target *target) {
   int x_if_we_brake_now = coord_if_we_break_now(self->pos_x, self->speed_x);
   return (target->x <= x_if_we_brake_now && x_if_we_brake_now <= target->xright);
@@ -178,7 +182,7 @@ bool is_overshooting_target_if_brake_now(const struct player *self, const struct
 }
 
 int will_player_touch_target_X_with_current_speed(const struct player *self, const struct target *target) {
-  if (target_is_player_on(target, self)) {
+  if (player_is_on_target(self, target)) {
     return 0;
   }
 
@@ -199,7 +203,7 @@ int will_player_touch_target_X_with_current_speed(const struct player *self, con
 }
 
 int will_player_touch_target_Y_with_current_speed(const struct player *self, const struct target *target) {
-  if (target_is_player_on(target, self)) {
+  if (player_is_on_target(self, target)) {
     return 0;
   }
 
@@ -229,6 +233,18 @@ int will_player_touch_target_with_current_speed(const struct player *self, const
   return -1;
 }
 
+void player_slow_down_to_avoid_borders(struct player *self, const int GRID_SIZE) {
+  if ((self->speed_x < 0 && self->pos_x < sum_1_to_n(self->speed_x)) || (self->speed_x > 0 && GRID_SIZE - self->pos_x < 1 + sum_1_to_n(self->speed_x))) {
+    player_reduce_speed_x(self); // la sous-fonction vérifie que l'on ne ralentit pas 2 fois
+    player_reduce_speed_x(self);
+  }
+
+  if ((self->speed_y < 0 && self->pos_y < sum_1_to_n(self->speed_y)) || (self->speed_y > 0 && GRID_SIZE - self->pos_y < 1 + sum_1_to_n(self->speed_y))) {
+    player_reduce_speed_y(self); // la sous-fonction vérifie que l'on ne ralentit pas 2 fois
+    player_reduce_speed_y(self);
+  }
+}
+
 /*
  * ----------------------------------------
  * Struct target
@@ -246,18 +262,18 @@ void target_init(struct target *self, char *buf) {
   self->y = atoi(buf);
   // Largeur de l'objectif
   fgets(buf, BUFSIZE, stdin);
-  self->w = atoi(buf);
+  int w = atoi(buf);
   // Hauteur de l'objectif
   fgets(buf, BUFSIZE, stdin);
+  int h = atoi(buf);
 
-  self->h = atoi(buf);
-  self->xright = self->x + self->w - 1;
-  self->ybottom = self->y + self->h - 1;
-  self->value = 0x7FFFFFFF;
+  self->xright = self->x + w - 1;
+  self->ybottom = self->y + h - 1;
+  self->value = 0x7FFFFFFF; // On initialise au maximum des entier pour la comparaison plus tard
 }
 
 void target_dump(const struct target *self) {
-  fprintf(stderr, "Cible : %i %i to %i %i (%ix%i) value %i\n", self->x, self->y, self->xright, self->ybottom, self->w, self->h, self->value);
+  fprintf(stderr, "Cible : %i %i to %i %i - value %i\n", self->x, self->y, self->xright, self->ybottom, self->value);
 }
 
 void target_copy(const struct target *self, struct target *copy) {
@@ -266,13 +282,7 @@ void target_copy(const struct target *self, struct target *copy) {
 
   copy->x = self->x;
   copy->y = self->y;
-  copy->w = self->w;
-  copy->h = self->h;
   copy->xright = self->xright;
   copy->ybottom = self->ybottom;
   copy->value = 0x7FFFFFFF;
-}
-
-bool target_is_player_on(const struct target *self, const struct player *player) {
-  return (self->x <= player->pos_x && player->pos_x <= self->x + self->w && self->y <= player->pos_y && player->pos_y <= self->y + self->h);
 }

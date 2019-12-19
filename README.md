@@ -1,19 +1,8 @@
 # Race
-Un joueur cherche à atteindre tous les objectifs répartis sur un terrain.
+Un joueur cherche à atteindre tous les objectifs répartis sur un terrain généré aléatoirement par le serveur.
 Projet d'Algorithmique (L2 -S3) réalisé par [**@nathanaelhoun**](https://github.com/nathanaelhoun) et [**@ValentinLab**](https://github.com/ValentinLab).
 
-## Seeds pour tests
-*Utilisation avec `./race-server -s seed ./joueur`*
-
--  Seed sympa avec beaucoup de petites cibles `2709897513`
-
-- [x] Cugnot disqualifié : `1508001905`
-- [x] Multipla explose Race-hi `2938387905`
-- [x] Race-hi explose multipla (points) : `577644688`
-- [ ] Race-hi dépasse multipla (trajectoire) : `1697104660`
-- [x] Race-hi dépasse de peu multipla (trajectoire) : `1225875559`
-- [ ] Multipla disqualifié (deux objectifs d'affilée au bon endroit) : `3785148849`
-- [ ] Multipla disqualifié (apparait sur un objectif) : `1713067925`
-- [x] Trottinette disqualifié : `3050529712`
-- [x] Trottinette disqualifiée : `1318867896`
-- [ ] Trottinette boucle infinie : `1983039468`
+## Joueurs
+- `cugnot` : en hommage à la première voiture, ce joueur se contente d'atteindre la cible sans se préoccuper du score des cases du terrain. C'est déjà un exploit qu'elle ne rentre pas dans les murs.
+- `trottinette` : très rapide mais sans freins, elle se dirige le plus vite possible vers la cible. Pas encore tout à fait au point.
+- `tesla` : rapide et intelligente, elle se dirige si habilement qu'elle s'arrête sur la case proche d'elle au score le plus bas.
