@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 
 color_default="\033[39m"
 color_blue="\033[34m"
@@ -6,23 +6,26 @@ color_red="\033[31m"
 format_default="\033[0m"
 format_bold="\033[1m"
 
-if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
-        echo -e "${format_bold}${color_blue}Stats for Race${format_default}${color_default}"
+echo "$1"
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "${format_bold}${color_blue}Stats for Race${format_default}${color_default}"
         echo "Made by Nathanaël H."
-        echo ""
+        echo
         echo "  Usage :"
         echo "      stats-for-race <iteration> <player1> [player2] [player3] [player4]"
         echo "      stats-for-race (-h | --help)"
-        echo ""
+        echo
         echo "  Options : "
         echo "      <iteration> Number of tests"
         echo "      <players> Path to an executable player (for example, './myplayer')"
+	echo
         exit 0
     fi
 
 if [ "$#" -lt 2 ] || [ "$#" -gt 5 ] ; then
-    echo -e "${color_red}stats-for-race : Illegal number of parameters.${color_default} Please try 'stats-for-race --help'"
-    exit 0
+    echo "${color_red}stats-for-race : Illegal number of parameters.${color_default} Please try 'stats-for-race --help'"
+    exit 1
 fi
 
 iteration_nb=$1
@@ -32,8 +35,8 @@ p2_name=$3
 p3_name=$4
 p4_name=$5
 
-echo -e "${format_bold}${color_blue}Statistiques pour Race${format_default}${color_default}"
-echo -e "Nombre d'itérations : $iteration_nb"
+echo "${format_bold}${color_blue}Statistiques pour Race${format_default}${color_default}"
+echo "Nombre d'itérations : $iteration_nb"
 
 if [ -e error-server.log ]; then
     rm error-server.log
@@ -41,7 +44,7 @@ fi
 
 players=$p1_name" "$p2_name" "$p3_name" "$p4_name
 for i in `seq 1 $iteration_nb`; do
-    echo -e "${color_blue}---Itération numéro $i ${color_default}"
+    echo "${color_blue}---Itération numéro $i ${color_default}"
     ./race-server $players >> stats.log 2>> error-server.log
 done
 
@@ -79,13 +82,13 @@ for i in `seq 1 $iteration_nb`; do
 
         is_disqualified=$(tail -n 1 stats.log | grep 'DISQUALIFIED!')
         if [ -n "$is_disqualified" ]; then
-            echo -e "${color_blue}Traitement de la participation n°$number ~ ${color_red}Oh nooon : $player DISQUALIFIÉ ! ${color_default}"
-        else 
+            echo "${color_blue}Traitement de la participation n°$number ~ ${color_red}Oh nooon : $player DISQUALIFIÉ ! ${color_default}"
+        else
             total=$(tail -n 1 stats.log | cut -d' ' -f3)
             moves=$(tail -n 1 stats.log | cut -d' ' -f5 | rev | cut -c 2- | rev)
             score=$(tail -n 1 stats.log | cut -d' ' -f7 | rev | cut -c 2- | rev)
 
-            if [ "$p1_name" == "$player" ]; then
+            if [ "$p1_name" = "$player" ]; then
                 p1_total=$(expr $p1_total + $total)
                 p1_moves=$(expr $p1_moves + $moves)
                 p1_score=$(expr $p1_score + $score)
@@ -94,7 +97,7 @@ for i in `seq 1 $iteration_nb`; do
                     fi
             fi
 
-            if [ "$p2_name" == "$player" ]; then
+            if [ "$p2_name" = "$player" ]; then
                 p2_total=$(expr $p2_total + $total)
                 p2_moves=$(expr $p2_moves + $moves)
                 p2_score=$(expr $p2_score + $score)
@@ -103,7 +106,7 @@ for i in `seq 1 $iteration_nb`; do
                     fi
             fi
 
-            if [ "$p3_name" == "$player" ]; then
+            if [ "$p3_name" = "$player" ]; then
                 p3_total=$(expr $p3_total + $total)
                 p3_moves=$(expr $p3_moves + $moves)
                 p3_score=$(expr $p3_score + $score)
@@ -112,7 +115,7 @@ for i in `seq 1 $iteration_nb`; do
                     fi
             fi
 
-            if [ "$p4_name" == "$player" ]; then
+            if [ "$p4_name" = "$player" ]; then
                 p4_total=$(expr $p4_total + $total)
                 p4_moves=$(expr $p4_moves + $moves)
                 p4_score=$(expr $p4_score + $score)
@@ -121,27 +124,26 @@ for i in `seq 1 $iteration_nb`; do
                     fi
             fi
 
-            echo -e "${color_blue}Traitement de la participation n°$number ~ ${color_default}Résultat : $player $total (moves: $moves, score: $score)"
-        fi 
+            echo "${color_blue}Traitement de la participation n°$number ~ ${color_default}Résultat : $player $total (moves: $moves, score: $score)"
+        fi
         head -n -1 stats.log > temp.txt
         mv temp.txt stats.log
     done
 done
 
-echo 
-echo -e "${color_red}Résultats finaux : ${color_default}"
+echo
+echo "${color_red}Résultats finaux : ${color_default}"
 
 if [ $player_nb -eq 1 ]; then
     echo "$p1_name: $p1_total (moves: $p1_moves, score: $p1_score)"
-    echo ""
-    exit 0
+    echo
 fi
-        
-if [ $player_nb -eq 2 ]; then 
+
+if [ $player_nb -eq 2 ]; then
     if [ $p1_total -gt $p2_total ]; then
         echo "(1) $p2_name: $p2_victories victoires [$p2_total (moves: $p2_moves, score: $p2_score)]"
         echo "(2) $p1_name: $p1_victories victoires [$p1_total (moves: $p1_moves, score: $p1_score)]"
-    else 
+    else
         echo "(1) $p1_name: $p1_victories victoires [$p1_total (moves: $p1_moves, score: $p1_score)]"
         echo "(2) $p2_name: $p2_victories victoires [$p2_total (moves: $p2_moves, score: $p2_score)]"
     fi
@@ -150,12 +152,14 @@ else
     echo "$p2_name: $p2_victories victoires [$p2_total (moves: $p2_moves, score: $p2_score)]"
     echo "$p3_name: $p3_victories victoires [$p3_total (moves: $p3_moves, score: $p3_score)]"
 
-    if [ $player_nb -eq 4 ]; then 
+    if [ $player_nb -eq 4 ]; then
         echo "$p4_name: $p4_victories victoires [$p4_total (moves: $p4_moves, score: $p4_score)]"
     fi
 fi
-echo ""
+echo
 
 if [ -e stats.log ]; then
     rm stats.log
 fi
+
+exit 0
